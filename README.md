@@ -1,33 +1,48 @@
-untuk pengaktifan =
+# Langkah 1: Setup Awal Proyek (Inisialisasi)
 
-term folder = 
+Buka terminal pada folder utama proyek Anda, lalu jalankan perintah berikut secara berurutan:
 
-*npm init -y*
-*npm install express mongoose*
-*npm create vite@latest client -- --template react*
+## 1. Membuat file konfigurasi package.json otomatis
+npm init -y
 
-abit itu *cd client*
+## 2. Menginstal framework Express dan library Mongoose untuk database MongoDB
+npm install express mongoose
 
-masukkin ko *npm install*
+## 3. Membuat folder frontend berbasis React menggunakan Vite dengan nama folder 'client'
+npm create vite@latest client -- --template react
 
-baru tu
+# Langkah 2: Menginstal Dependensi Frontend
 
-*cd ..*
+Masuk ke dalam folder frontend yang baru saja dibuat untuk menginstal modul bawaan React:
 
-*node server.js*
+## 1. Berpindah masuk ke dalam folder 'client'
+cd client
 
-nahh klo udh tutup dulu browsernya / termnya
+## 2. Menginstal semua library/package bawaan React + Vite
+npm install
 
-abis itu 
+# Langkah 3: Uji Coba Server Lokal (Development)
 
-*cd client*
+Untuk memastikan backend Express Mas sudah berjalan sebelum digabungkan, kembali ke folder utama:
 
-*npm run build*
+## 1. Keluar dari folder client balik ke folder utama
+cd ..
 
-nahh tunggu abis itu 
+## 2. Menjalankan server backend Express
+node server.js
 
-*cd ..*
+# Langkah 4: Kompilasi Frontend & Penggabungan (Production)
 
-*node server.js*
+Agar React dan Express bisa menyatu dalam satu server, kita harus melakukan proses build pada React terlebih dahulu:
 
-udah dehh disitu lah nanti kalian atur
+## 1. Masuk kembali ke folder client
+cd client
+
+## 2. Melakukan kompilasi/build React menjadi file statis (akan menghasilkan folder 'dist')
+npm run build
+
+## 3. Tunggu sampai proses build selesai, lalu kembali ke folder utama
+cd ..
+
+## 4. Jalankan kembali server Express Anda
+node server.js
