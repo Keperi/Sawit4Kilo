@@ -1,3 +1,10 @@
+# !!! JANGAN LUPA
+
+Install node js sama mongo db
+
+
+
+
 # Langkah 1: Setup Awal Proyek (Inisialisasi)
 
 Buka terminal pada folder utama proyek Anda, lalu jalankan perintah berikut secara berurutan:
