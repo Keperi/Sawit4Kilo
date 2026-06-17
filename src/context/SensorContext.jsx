@@ -2,28 +2,24 @@ import React, { createContext, useState, useEffect, useCallback, useRef } from '
 
 export const SensorContext = createContext();
 
-// Generate a single simulated data point
-const generateDataPoint = (phMin, tdsMax) => {
-  const ph = parseFloat((Math.random() * 8 + 2).toFixed(1)); // 2.0 - 10.0
-  const tds = Math.floor(Math.random() * 1500 + 100);        // 100 - 1600
-  const isPhDanger = ph < phMin;
-  const isTdsDanger = tds > tdsMax;
-
-  return {
-    ph,
-    tds,
-    isPhDanger,
-    isTdsDanger,
-    status: (isPhDanger || isTdsDanger) ? 'BAHAYA' : 'AMAN',
-  };
+const generateInitialChartData = () => {
+  const data = [];
+  const now = new Date();
+  for (let i = 30; i >= 0; i--) {
+    const time = new Date(now.getTime() - i * 60000);
+    data.push({
+      time: time.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+      ph: parseFloat((Math.random() * 4 + 3).toFixed(1)),
+      tds: Math.floor(Math.random() * 800 + 400),
+    });
+  }
+  return data;
 };
 
-// Format time as HH:MM:SS
 const formatTime = (date) => {
   return date.toLocaleTimeString('id-ID', { hour12: false });
 };
 
-// Format timestamp for history table
 const formatTimestamp = (date) => {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -34,18 +30,25 @@ const formatTimestamp = (date) => {
   return `${y}-${m}-${d} ${h}:${min}:${s}`;
 };
 
+const getNodeStatus = (node, phThresholdMin, phThresholdMax, tdsThreshold) => {
+  if (!node.online) return 'OFFLINE';
+  const isPhDanger = node.ph < phThresholdMin || node.ph > phThresholdMax;
+  const isTdsDanger = node.tds > tdsThreshold;
+  return (isPhDanger || isTdsDanger) ? 'BAHAYA' : 'AMAN';
+};
+
 export const SensorProvider = ({ children }) => {
-  // New States based on specs
-  const [userState, setUserState] = useState({
+  const [userState] = useState({
     name: 'Admin KIDECO',
     role: 'Environment Engineer',
     sessionActive: true
   });
   
-  const [activeSensor, setActiveSensor] = useState('ALL'); // 'ALL' | 'PH' | 'TDS'
+  const [activeSensor, setActiveSensor] = useState('ALL');
   const [audioToggleState, setAudioToggleState] = useState(false);
+  const [allAlarmsMuted, setAllAlarmsMuted] = useState(false);
+  const [buzzerActive, setBuzzerActive] = useState(false);
 
-  // Thresholds
   const [phThresholdMin, setPhThresholdMin] = useState(() => {
     const saved = localStorage.getItem('KIDECO_PH_MIN');
     return saved ? parseFloat(saved) : 4.5;
@@ -54,21 +57,21 @@ export const SensorProvider = ({ children }) => {
     const saved = localStorage.getItem('KIDECO_PH_MAX');
     return saved ? parseFloat(saved) : 9.0;
   });
+  const [tdsThreshold, setTdsThreshold] = useState(() => {
+    const saved = localStorage.getItem('KIDECO_TDS_MAX');
+    return saved ? parseFloat(saved) : 800;
+  });
 
-  // Current sensor values
   const [currentPh, setCurrentPh] = useState(3.2);
   const [currentTds, setCurrentTds] = useState(1200);
   const [lastTimestamp, setLastTimestamp] = useState(formatTime(new Date()));
 
-  // System status derived
   const isPhAlert = currentPh < phThresholdMin || currentPh > phThresholdMax;
-  const isTdsAlert = currentTds > 800; // Static value as per new PRD
+  const isTdsAlert = currentTds > tdsThreshold;
   const systemStatus = (isPhAlert || isTdsAlert) ? 'BAHAYA' : 'AMAN';
 
-  // Audio alarm
   const audioContextRef = useRef(null);
 
-  // Chart data — last 5 minutes (about 300 points at 1s intervals, but we'll keep ~60)
   const [chartData, setChartData] = useState(() => {
     const data = [];
     const now = new Date();
@@ -83,7 +86,6 @@ export const SensorProvider = ({ children }) => {
     return data;
   });
 
-  // History data — sample rows
   const [historyData] = useState([
     { id: 1, nodeId: 'KDC01', timestamp: '2026-06-09 21:30:05', ph: 6.2, tds: 310, status: 'AMAN' },
     { id: 2, nodeId: 'KDC01', timestamp: '2026-06-09 21:15:02', ph: 3.2, tds: 1200, status: 'ASAM' },
@@ -107,10 +109,31 @@ export const SensorProvider = ({ children }) => {
     { id: 20, nodeId: 'KDC01', timestamp: '2026-06-09 16:45:16', ph: 5.3, tds: 560, status: 'AMAN' },
   ]);
 
-  // Selected node
   const [selectedNode, setSelectedNode] = useState('KDC01');
 
-  // Real-time simulation — 1 second interval
+  const [nodes, setNodes] = useState([
+    {
+      id: 'KDC01',
+      name: 'KDC01',
+      location: 'Kolam Pengendap 1',
+      online: true,
+      ph: 3.2,
+      tds: 1200,
+      lastUpdate: new Date(),
+      chartData: generateInitialChartData(),
+    },
+    {
+      id: 'KDC02',
+      name: 'KDC02',
+      location: 'Kolam Pengendap 2',
+      online: false,
+      ph: 7.0,
+      tds: 240,
+      lastUpdate: new Date(Date.now() - 45000),
+      chartData: generateInitialChartData(),
+    },
+  ]);
+
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -134,7 +157,6 @@ export const SensorProvider = ({ children }) => {
 
       setLastTimestamp(timeStr);
 
-      // Append to chart data, keep last 60 points
       setChartData((prev) => {
         const newPoint = {
           time: timeStr,
@@ -144,12 +166,50 @@ export const SensorProvider = ({ children }) => {
         const updated = [...prev, newPoint];
         return updated.length > 60 ? updated.slice(-60) : updated;
       });
+
+      setNodes((prev) =>
+        prev.map((node) => {
+          const shouldGoOffline = node.id === 'KDC02' && Math.random() < 0.05;
+          const shouldComeOnline = node.id === 'KDC02' && !node.online && Math.random() < 0.1;
+
+          let newOnline = node.online;
+          if (shouldGoOffline) newOnline = false;
+          if (shouldComeOnline) newOnline = true;
+
+          if (!newOnline) {
+            return { ...node, online: false };
+          }
+
+          const phChange = Math.random() * 0.4 - 0.2;
+          let newPh = parseFloat((node.ph + phChange).toFixed(1));
+          if (newPh < 2.0) newPh = 2.0;
+          if (newPh > 10.0) newPh = 10.0;
+
+          const tdsChange = Math.floor(Math.random() * 30 - 15);
+          let newTds = node.tds + tdsChange;
+          if (newTds < 100) newTds = 100;
+          if (newTds > 1600) newTds = 1600;
+
+          const miniTime = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+          const newPoint = { time: miniTime, ph: newPh, tds: newTds };
+          const updatedChart = [...node.chartData, newPoint];
+          const trimmedChart = updatedChart.length > 30 ? updatedChart.slice(-30) : updatedChart;
+
+          return {
+            ...node,
+            online: true,
+            ph: newPh,
+            tds: newTds,
+            lastUpdate: now,
+            chartData: trimmedChart,
+          };
+        })
+      );
     }, 1000);
 
     return () => clearInterval(interval);
   }, [currentPh, currentTds]);
 
-  // Play alarm beep when danger detected and audio alarm is on
   useEffect(() => {
     if (audioToggleState && systemStatus === 'BAHAYA') {
       try {
@@ -172,11 +232,15 @@ export const SensorProvider = ({ children }) => {
     }
   }, [audioToggleState, systemStatus, currentPh, currentTds]);
 
-  const updateThresholds = useCallback(({ phMin, phMax }) => {
+  const updateThresholds = useCallback(({ phMin, phMax, tdsMax }) => {
     setPhThresholdMin(phMin);
     setPhThresholdMax(phMax);
     localStorage.setItem('KIDECO_PH_MIN', String(phMin));
     localStorage.setItem('KIDECO_PH_MAX', String(phMax));
+    if (tdsMax !== undefined) {
+      setTdsThreshold(tdsMax);
+      localStorage.setItem('KIDECO_TDS_MAX', String(tdsMax));
+    }
   }, []);
 
   const toggleAudioAlarm = useCallback(() => {
@@ -186,14 +250,16 @@ export const SensorProvider = ({ children }) => {
   return (
     <SensorContext.Provider
       value={{
-        // New Spec States
         userState,
         activeSensor,
         setActiveSensor,
         audioToggleState,
         setAudioToggleState,
+        allAlarmsMuted,
+        setAllAlarmsMuted,
+        buzzerActive,
+        setBuzzerActive,
         
-        // Current readings
         currentPh,
         currentTds,
         lastTimestamp,
@@ -201,23 +267,24 @@ export const SensorProvider = ({ children }) => {
         isPhAlert,
         isTdsAlert,
 
-        // Thresholds
         phThresholdMin,
         phThresholdMax,
+        tdsThreshold,
+        setTdsThreshold,
         updateThresholds,
 
-        // Audio
         toggleAudioAlarm,
 
-        // Chart
         chartData,
 
-        // History
         historyData,
 
-        // Node
         selectedNode,
         setSelectedNode,
+
+        nodes,
+        setNodes,
+        getNodeStatus: (node) => getNodeStatus(node, phThresholdMin, phThresholdMax, tdsThreshold),
       }}
     >
       {children}

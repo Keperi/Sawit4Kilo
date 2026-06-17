@@ -3,14 +3,14 @@ import { SensorContext } from '../../context/SensorContext';
 import { AlertCircle } from '@untitledui/icons';
 
 const GlobalDangerAlert = ({ activePage }) => {
-  const { systemStatus, selectedNode } = useContext(SensorContext);
+  const { systemStatus, selectedNode, audioToggleState } = useContext(SensorContext);
   const audioRef = useRef(null);
 
   const isDanger = systemStatus === 'BAHAYA';
   const shouldShow = isDanger && activePage !== 'dashboard';
 
   useEffect(() => {
-    if (shouldShow) {
+    if (shouldShow && audioToggleState) {
       if (!audioRef.current) {
         audioRef.current = new Audio('/assets/sounds/alarm.mp3');
       }
@@ -30,7 +30,7 @@ const GlobalDangerAlert = ({ activePage }) => {
         audioRef.current.currentTime = 0;
       }
     };
-  }, [shouldShow]);
+  }, [shouldShow, audioToggleState]);
 
   if (!shouldShow) return null;
 

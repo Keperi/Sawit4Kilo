@@ -3,8 +3,8 @@ import { Download01 } from '@untitledui/icons';
 import * as XLSX from 'xlsx';
 import Button from '../ui/Button';
 
-const ExportButton = ({ variant = 'primary', label, data, fileName }) => {
-  const isPrimary = variant === 'primary';
+const ExportButton = ({ color = 'primary', label, data, fileName }) => {
+  const isPrimary = color === 'primary';
 
   const handleExportExcel = () => {
     if (!data || data.length === 0) return;
@@ -42,10 +42,10 @@ const ExportButton = ({ variant = 'primary', label, data, fileName }) => {
 
   return (
     <Button
-      id={`export-${variant}`}
+      id={`export-${color}`}
       onClick={handleClick}
-      variant={isPrimary ? 'primary' : 'secondary'}
-      leadingIcon={<Download01 />}
+      color={isPrimary ? 'primary' : 'secondary'}
+      iconLeading={<Download01 />}
     >
       {label}
     </Button>

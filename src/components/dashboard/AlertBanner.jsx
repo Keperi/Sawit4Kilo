@@ -1,42 +1,76 @@
-import React from 'react';
-import { AlertCircle, CheckCircle } from '@untitledui/icons';
+import React, { useState, useEffect, useRef } from 'react';
+import { AlertCircle, CheckCircle, Loading01 } from '@untitledui/icons';
+import { getAIInsight } from '../../utils/gemini';
 
-const AlertBanner = ({ message, location, isDanger = true }) => {
+const AI_COOLDOWN_MS = 60_000;
+
+const AlertBanner = ({ message, location, isDanger = true, sensorData, onAction }) => {
+  const [insight, setInsight] = useState('');
+  const [loading, setLoading] = useState(false);
+  const prevIsDangerRef = useRef(false);
+  const lastFetchTimeRef = useRef(0);
+
+  useEffect(() => {
+    const justBecameDanger = isDanger && !prevIsDangerRef.current;
+    const cooldownElapsed = Date.now() - lastFetchTimeRef.current > AI_COOLDOWN_MS;
+
+    if (isDanger && sensorData && (justBecameDanger || cooldownElapsed)) {
+      lastFetchTimeRef.current = Date.now();
+      fetchInsight();
+    }
+
+    prevIsDangerRef.current = isDanger;
+  }, [isDanger]);
+
+  const fetchInsight = async () => {
+    setLoading(true);
+    const result = await getAIInsight(sensorData);
+    setInsight(result);
+    setLoading(false);
+  };
+
   return (
-    <div className={`border rounded-[10px] p-[16px_20px] mb-[18px] flex items-start justify-between gap-3 ${
+    <div className={`border rounded-[10px] p-5 mb-[18px] flex gap-4 items-start ${
       isDanger ? 'bg-[#FEF9F8] border-[#FDDDD6]' : 'bg-[#F0FDF4] border-[#BBF7D0]'
     }`}>
-      <div className="flex gap-[12px] items-start">
-        <div className={`w-[36px] h-[36px] rounded-[7px] flex items-center justify-center shrink-0 ${
-          isDanger ? 'bg-[#FEE8E2]' : 'bg-[#DCFCE7]'
-        }`}>
-          {isDanger ? (
-            <AlertCircle size={18} strokeWidth={2.5} className="text-[#C84B2F]" />
+      <div className={`w-[36px] h-[36px] rounded-[7px] flex items-center justify-center shrink-0 ${
+        isDanger ? 'bg-[#FEE8E2]' : 'bg-[#DCFCE7]'
+      }`}>
+        {isDanger ? (
+          <AlertCircle size={18} strokeWidth={2.5} className="text-[#C84B2F]" />
+        ) : (
+          <CheckCircle size={18} strokeWidth={2.5} className="text-[#166534]" />
+        )}
+      </div>
+      <div className="flex-1">
+        <div className={`text-[15px] font-semibold ${isDanger ? 'text-[#9B2617]' : 'text-[#166534]'}`}>
+          {isDanger ? `Peringatan kritis: ${message} pada ` : 'Status normal: Kualitas air baik pada '}
+          <span className={`underline cursor-pointer ${isDanger ? 'decoration-[#E8533A] text-[#E8533A]' : 'decoration-[#22C55E] text-[#22C55E]'}`}>
+            {location}
+          </span>
+        </div>
+        <div className={`text-[13px] mt-2 ${isDanger ? 'text-[#C84B2F]' : 'text-[#15803D]'}`}>
+          <span className="font-medium">Insight:</span>{' '}
+          {loading ? (
+            <span className="inline-flex items-center gap-1.5">
+              <Loading01 size={12} className="animate-spin" />
+              <span className="text-[#B9C8D7]">Menganalisis...</span>
+            </span>
           ) : (
-            <CheckCircle size={18} strokeWidth={2.5} className="text-[#166534]" />
+            insight || (isDanger
+              ? 'Tingkat keasaman di luar ambang batas aman.'
+              : 'Semua parameter terpantau dalam rentang toleransi yang aman.')
           )}
         </div>
-        <div>
-          <div className={`text-[15px] font-semibold ${isDanger ? 'text-[#9B2617]' : 'text-[#166534]'}`}>
-            {isDanger ? `Peringatan kritis: ${message} pada ` : 'Status normal: Kualitas air baik pada '}
-            <span className={`underline cursor-pointer ${isDanger ? 'decoration-[#E8533A] text-[#E8533A]' : 'decoration-[#22C55E] text-[#22C55E]'}`}>
-              {location}
-            </span>
-          </div>
-          <div className={`text-[13px] mt-[4px] ${isDanger ? 'text-[#C84B2F]' : 'text-[#15803D]'}`}>
-            <span className="font-medium">Insight:</span> {
-              isDanger 
-                ? 'Tingkat keasaman di luar ambang batas aman. Pompa penetralisasi disarankan segera diaktifkan.'
-                : 'Semua parameter terpantau dalam rentang toleransi yang aman. Sistem beroperasi optimal.'
-            }
-          </div>
-        </div>
+        {isDanger && (
+          <button
+            onClick={onAction}
+            className="mt-4 px-[16px] py-[8px] rounded-[7px] bg-[#E8533A] text-white text-[13px] font-medium cursor-pointer border-none hover:bg-[#C84B2F] transition-colors"
+          >
+            Ambil tindakan
+          </button>
+        )}
       </div>
-      {isDanger && (
-        <button className="shrink-0 px-[16px] py-[8px] rounded-[7px] bg-[#E8533A] text-white text-[13px] font-medium cursor-pointer border-none whitespace-nowrap hover:bg-[#C84B2F] transition-colors">
-          Ambil tindakan
-        </button>
-      )}
     </div>
   );
 };
