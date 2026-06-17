@@ -14,7 +14,7 @@ import {
   linearRegression,
   generateStatsSummary,
 } from '../utils/analytics';
-import { getAIInsight, getActionPlan } from '../utils/gemini';
+import { getAIInsight, getActionPlan } from '../utils/groq';
 import { BarChart02 } from '@untitledui/icons';
 
 const AnalyticsPage = () => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AlertCircle, CheckCircle, Loading01 } from '@untitledui/icons';
-import { getAIInsight } from '../../utils/gemini';
+import { getAIInsight } from '../../utils/groq';
 
 const AI_COOLDOWN_MS = 60_000;
 
