@@ -82,9 +82,12 @@ test.describe('TC-02: Layout Halaman Analisis', () => {
     await page.goto('/');
     await page.click('text=Analisis');
 
-    // Pastikan modul-modul utama analytics terlihat
-    await expect(page.locator('text=Tren Real-Time').or(page.locator('text=Trend'))).toBeVisible({ timeout: 8000 });
-    await expect(page.locator('text=Forecast').or(page.locator('text=Prediksi'))).toBeVisible({ timeout: 8000 });
+    // Heading yang ada di halaman berdasarkan struktur aktual komponen analytics
+    await expect(page.locator('text=Tren & Korelasi pH vs TDS')).toBeVisible({ timeout: 8000 });
+    await expect(page.locator('text=Prediksi Sederhana')).toBeVisible({ timeout: 8000 });
+    await expect(page.locator('text=Statistik Ringkasan')).toBeVisible({ timeout: 8000 });
+    await expect(page.locator('text=Deteksi Anomali')).toBeVisible({ timeout: 8000 });
+    await expect(page.locator('text=Perbandingan antar Node')).toBeVisible({ timeout: 8000 });
   });
 
   test('Konten halaman analisis tidak crash (tidak blank putih)', async ({ page }) => {
@@ -94,9 +97,8 @@ test.describe('TC-02: Layout Halaman Analisis', () => {
 
     // Halaman tidak boleh blank — sidebar harus tetap terlihat
     await expect(page.locator('#sidebar-nav')).toBeVisible();
-    // Main content area harus ada isinya
-    const mainContent = page.locator('main');
-    await expect(mainContent).not.toBeEmpty();
+    // Header harus ada dengan judul Analisis
+    await expect(page.locator('#header-bar')).toContainText('Analisis');
   });
 
 });
