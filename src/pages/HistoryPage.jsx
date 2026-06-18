@@ -18,22 +18,26 @@ const HistoryPage = () => {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [acidityFilter, setAcidityFilter] = useState('ALL');
+  const [nodeFilter, setNodeFilter] = useState('ALL');
 
   const [appliedFilters, setAppliedFilters] = useState({
     dateFrom: '',
     dateTo: '',
     acidity: 'ALL',
+    nodeId: 'ALL',
   });
 
   const [currentPage, setCurrentPage] = useState(0);
 
   const handleApplyFilter = useCallback(() => {
-    setAppliedFilters({ dateFrom, dateTo, acidity: acidityFilter });
+    setAppliedFilters({ dateFrom, dateTo, acidity: acidityFilter, nodeId: nodeFilter });
     setCurrentPage(0);
-  }, [dateFrom, dateTo, acidityFilter]);
+  }, [dateFrom, dateTo, acidityFilter, nodeFilter]);
 
   const filteredData = useMemo(() => {
     return historyData.filter((row) => {
+      if (appliedFilters.nodeId !== 'ALL' && row.nodeId !== appliedFilters.nodeId) return false;
+
       if (appliedFilters.acidity === 'ACIDIC' && row.status !== 'ASAM') return false;
       if (appliedFilters.acidity === 'NEUTRAL' && row.status !== 'AMAN') return false;
       if (appliedFilters.acidity === 'ALKALINE' && row.ph >= 4.5 && row.ph <= 9.0 && row.tds <= 800) return false;
@@ -75,9 +79,11 @@ const HistoryPage = () => {
                 dateFrom={dateFrom}
                 dateTo={dateTo}
                 acidityFilter={acidityFilter}
+                nodeFilter={nodeFilter}
                 onDateFromChange={setDateFrom}
                 onDateToChange={setDateTo}
                 onAcidityChange={setAcidityFilter}
+                onNodeChange={setNodeFilter}
                 onApplyFilter={handleApplyFilter}
                 dataToExport={filteredData}
               />
@@ -90,7 +96,12 @@ const HistoryPage = () => {
               Menampilkan <span className="font-bold text-[#202020]">{filteredData.length}</span> entri
               {appliedFilters.acidity !== 'ALL' && (
                 <Badge variant="primary" className="ml-2">
-                  Filter: {appliedFilters.acidity}
+                  Status: {appliedFilters.acidity}
+                </Badge>
+              )}
+              {appliedFilters.nodeId !== 'ALL' && (
+                <Badge variant="primary" className="ml-2">
+                  Node: {appliedFilters.nodeId}
                 </Badge>
               )}
             </span>
