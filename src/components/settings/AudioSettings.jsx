@@ -113,7 +113,7 @@ const AudioSettings = () => {
         {/* Info */}
         <div className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-[8px] p-4">
           <p className="text-[12px] text-[#1E40AF] leading-relaxed">
-            <strong className="font-semibold">Catatan:</strong> Alarm pH menggunakan suara alarm standar, sedangkan Buzzer menggunakan suara alarm kiamat. Keduanya aktif saat status sistem == BAHAYA.
+            <strong className="font-semibold">Catatan:</strong> Alarm pH dan Buzzer menggunakan suara alarm yang sama. Keduanya aktif saat status sistem == BAHAYA.
           </p>
         </div>
       </div>
