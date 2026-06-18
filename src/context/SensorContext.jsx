@@ -1,22 +1,10 @@
 import React, { createContext, useState, useEffect, useCallback, useRef } from 'react';
+import { io as socketIO } from 'socket.io-client';
 
 export const SensorContext = createContext();
 
-// Generate a single simulated data point
-const generateDataPoint = (phMin, tdsMax) => {
-  const ph = parseFloat((Math.random() * 8 + 2).toFixed(1)); // 2.0 - 10.0
-  const tds = Math.floor(Math.random() * 1500 + 100);        // 100 - 1600
-  const isPhDanger = ph < phMin;
-  const isTdsDanger = tds > tdsMax;
-
-  return {
-    ph,
-    tds,
-    isPhDanger,
-    isTdsDanger,
-    status: (isPhDanger || isTdsDanger) ? 'BAHAYA' : 'AMAN',
-  };
-};
+const API_BASE_URL = 'http://localhost:3000/api';
+const SOCKET_URL = 'http://localhost:3000';
 
 // Format time as HH:MM:SS
 const formatTime = (date) => {
@@ -56,8 +44,8 @@ export const SensorProvider = ({ children }) => {
   });
 
   // Current sensor values
-  const [currentPh, setCurrentPh] = useState(3.2);
-  const [currentTds, setCurrentTds] = useState(1200);
+  const [currentPh, setCurrentPh] = useState(7.0);
+  const [currentTds, setCurrentTds] = useState(400);
   const [lastTimestamp, setLastTimestamp] = useState(formatTime(new Date()));
 
   // System status derived
@@ -68,54 +56,190 @@ export const SensorProvider = ({ children }) => {
   // Audio alarm
   const audioContextRef = useRef(null);
 
-  // Chart data — last 5 minutes (about 300 points at 1s intervals, but we'll keep ~60)
-  const [chartData, setChartData] = useState(() => {
-    const data = [];
-    const now = new Date();
-    for (let i = 60; i >= 0; i--) {
-      const time = new Date(now.getTime() - i * 5000);
-      data.push({
-        time: formatTime(time),
-        ph: parseFloat((Math.random() * 4 + 3).toFixed(1)),
-        tds: Math.floor(Math.random() * 800 + 400),
-      });
-    }
-    return data;
-  });
-
-  // History data — sample rows
-  const [historyData] = useState([
-    { id: 1, nodeId: 'KDC01', timestamp: '2026-06-09 21:30:05', ph: 6.2, tds: 310, status: 'AMAN' },
-    { id: 2, nodeId: 'KDC01', timestamp: '2026-06-09 21:15:02', ph: 3.2, tds: 1200, status: 'ASAM' },
-    { id: 3, nodeId: 'KDC02', timestamp: '2026-06-09 21:00:58', ph: 7.0, tds: 240, status: 'AMAN' },
-    { id: 4, nodeId: 'KDC02', timestamp: '2026-06-09 20:45:11', ph: 4.1, tds: 870, status: 'ASAM' },
-    { id: 5, nodeId: 'KDC01', timestamp: '2026-06-09 20:30:03', ph: 5.8, tds: 420, status: 'AMAN' },
-    { id: 6, nodeId: 'KDC01', timestamp: '2026-06-09 20:15:07', ph: 3.8, tds: 950, status: 'ASAM' },
-    { id: 7, nodeId: 'KDC02', timestamp: '2026-06-09 20:00:14', ph: 6.5, tds: 380, status: 'AMAN' },
-    { id: 8, nodeId: 'KDC01', timestamp: '2026-06-09 19:45:22', ph: 4.3, tds: 810, status: 'ASAM' },
-    { id: 9, nodeId: 'KDC02', timestamp: '2026-06-09 19:30:31', ph: 7.2, tds: 290, status: 'AMAN' },
-    { id: 10, nodeId: 'KDC01', timestamp: '2026-06-09 19:15:45', ph: 5.5, tds: 520, status: 'AMAN' },
-    { id: 11, nodeId: 'KDC02', timestamp: '2026-06-09 19:00:01', ph: 3.5, tds: 1100, status: 'ASAM' },
-    { id: 12, nodeId: 'KDC01', timestamp: '2026-06-09 18:45:09', ph: 6.8, tds: 350, status: 'AMAN' },
-    { id: 13, nodeId: 'KDC02', timestamp: '2026-06-09 18:30:18', ph: 4.0, tds: 920, status: 'ASAM' },
-    { id: 14, nodeId: 'KDC01', timestamp: '2026-06-09 18:15:27', ph: 7.5, tds: 270, status: 'AMAN' },
-    { id: 15, nodeId: 'KDC02', timestamp: '2026-06-09 18:00:33', ph: 5.0, tds: 680, status: 'AMAN' },
-    { id: 16, nodeId: 'KDC01', timestamp: '2026-06-09 17:45:41', ph: 3.1, tds: 1300, status: 'ASAM' },
-    { id: 17, nodeId: 'KDC02', timestamp: '2026-06-09 17:30:50', ph: 6.0, tds: 450, status: 'AMAN' },
-    { id: 18, nodeId: 'KDC01', timestamp: '2026-06-09 17:15:59', ph: 4.4, tds: 830, status: 'ASAM' },
-    { id: 19, nodeId: 'KDC02', timestamp: '2026-06-09 17:00:08', ph: 7.8, tds: 210, status: 'AMAN' },
-    { id: 20, nodeId: 'KDC01', timestamp: '2026-06-09 16:45:16', ph: 5.3, tds: 560, status: 'AMAN' },
-  ]);
+  // Chart data and History data
+  const [chartData, setChartData] = useState([]);
+  const [historyData, setHistoryData] = useState([]);
 
   // Selected node
   const [selectedNode, setSelectedNode] = useState('KDC01');
 
-  // Real-time simulation — 1 second interval
+  // Fetch initial history data from backend
+  const fetchHistory = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sensor-data?limit=100`);
+      const result = await response.json();
+      if (result.success && result.data && result.data.length > 0) {
+        // Map backend data format to frontend row format
+        const mappedHistory = result.data.map((item, index) => {
+          const itemDate = new Date(item.timestamp || item.createdAt);
+          const isPhDanger = item.ph < phThresholdMin || item.ph > phThresholdMax;
+          const isTdsDanger = item.tds > 800;
+          return {
+            id: item._id || index,
+            nodeId: selectedNode,
+            timestamp: formatTimestamp(itemDate),
+            ph: item.ph,
+            tds: item.tds,
+            status: (isPhDanger || isTdsDanger) ? 'ASAM' : 'AMAN',
+          };
+        });
+        setHistoryData(mappedHistory);
+
+        // Map reverse data for charts (chronological order)
+        const mappedCharts = result.data
+          .slice(0, 60)
+          .reverse()
+          .map((item) => {
+            const itemDate = new Date(item.timestamp || item.createdAt);
+            return {
+              time: formatTime(itemDate),
+              ph: item.ph,
+              tds: item.tds
+            };
+          });
+        setChartData(mappedCharts);
+      } else {
+        // Jika data di database masih kosong sama sekali, generate dummy chart/history agar UI tidak kosong
+        generateLocalStaticFallback();
+      }
+    } catch (error) {
+      console.warn('Gagal memuat histori dari API, menggunakan data simulasi lokal:', error.message);
+      generateLocalStaticFallback();
+    }
+  }, [phThresholdMin, phThresholdMax, selectedNode]);
+
+  // Helper untuk mengisi data chart & history awal secara lokal jika DB kosong
+  const generateLocalStaticFallback = () => {
+    const localHist = [];
+    const localChart = [];
+    const now = new Date();
+    
+    for (let i = 20; i >= 0; i--) {
+      const time = new Date(now.getTime() - i * 5000);
+      const ph = parseFloat((4.25 + Math.sin(time.getTime() / 60000) * 1.25).toFixed(2));
+      const tds = Math.round(450 + Math.cos(time.getTime() / 60000) * 150);
+      const isPhDanger = ph < phThresholdMin || ph > phThresholdMax;
+      const isTdsDanger = tds > 800;
+
+      localHist.push({
+        id: `local-${i}`,
+        nodeId: selectedNode,
+        timestamp: formatTimestamp(time),
+        ph,
+        tds,
+        status: (isPhDanger || isTdsDanger) ? 'ASAM' : 'AMAN',
+      });
+    }
+
+    for (let i = 60; i >= 0; i--) {
+      const time = new Date(now.getTime() - i * 5000);
+      const ph = parseFloat((4.25 + Math.sin(time.getTime() / 60000) * 1.25).toFixed(2));
+      const tds = Math.round(450 + Math.cos(time.getTime() / 60000) * 150);
+      localChart.push({
+        time: formatTime(time),
+        ph,
+        tds
+      });
+    }
+
+    setHistoryData(localHist);
+    setChartData(localChart);
+  };
+
+  // Handler update sensor dari WebSocket atau Fallback
+  const handleNewSensorData = useCallback((data) => {
+    const itemDate = new Date(data.timestamp || data.createdAt);
+    const timeStr = formatTime(itemDate);
+
+    setCurrentPh(data.ph);
+    setCurrentTds(data.tds);
+    setLastTimestamp(timeStr);
+
+    setChartData((prev) => {
+      const hasTime = prev.some((d) => d.time === timeStr);
+      if (hasTime) return prev;
+
+      const newPoint = {
+        time: timeStr,
+        ph: data.ph,
+        tds: data.tds,
+      };
+      const updated = [...prev, newPoint];
+      return updated.length > 60 ? updated.slice(-60) : updated;
+    });
+
+    // Refresh history
+    fetchHistory();
+  }, [fetchHistory]);
+
+  // Setup Koneksi Socket.io
   useEffect(() => {
-    const interval = setInterval(() => {
+    fetchHistory(); // Ambil riwayat di awal
+
+    const socket = socketIO(SOCKET_URL);
+
+    socket.on('connect', () => {
+      console.log('Socket.io connected:', socket.id);
+      fetchHistory(); // Ambil riwayat terbaru saat terhubung kembali
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Socket.io disconnected');
+    });
+
+    socket.on('sensor-update', (data) => {
+      console.log('Menerima update real-time sensor via socket:', data);
+      handleNewSensorData(data);
+    });
+
+    // Fallback polling tetap disiapkan apabila koneksi WS terputus
+    const fallbackInterval = setInterval(async () => {
+      if (!socket.connected) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/sensor-data/latest`);
+          const result = await response.json();
+          if (result.success && result.data) {
+            handleNewSensorData(result.data);
+          } else {
+            fetchDummyFallback();
+          }
+        } catch (e) {
+          fetchDummyFallback();
+        }
+      }
+    }, 3000);
+
+    return () => {
+      socket.disconnect();
+      clearInterval(fallbackInterval);
+    };
+  }, [fetchHistory, handleNewSensorData]);
+
+  // Fallback simulator jika API Utama atau Database offline / kosong
+  const fetchDummyFallback = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sensor-data/dummy`);
+      const result = await response.json();
+      if (result.success && result.data) {
+        const item = result.data;
+        const itemDate = new Date(item.timestamp);
+        const timeStr = formatTime(itemDate);
+
+        setCurrentPh(item.ph);
+        setCurrentTds(item.tds);
+        setLastTimestamp(timeStr);
+
+        setChartData((prev) => {
+          const newPoint = { time: timeStr, ph: item.ph, tds: item.tds };
+          const updated = [...prev, newPoint];
+          return updated.length > 60 ? updated.slice(-60) : updated;
+        });
+      }
+    } catch (err) {
+      // Offline local simulation generator jika backend mati total
       const now = new Date();
       const timeStr = formatTime(now);
-
+      
       setCurrentPh((prev) => {
         const change = Math.random() * 0.4 - 0.2;
         let next = parseFloat((prev + change).toFixed(1));
@@ -133,23 +257,15 @@ export const SensorProvider = ({ children }) => {
       });
 
       setLastTimestamp(timeStr);
-
-      // Append to chart data, keep last 60 points
       setChartData((prev) => {
-        const newPoint = {
-          time: timeStr,
-          ph: parseFloat((currentPh + Math.random() * 0.2 - 0.1).toFixed(1)),
-          tds: currentTds + Math.floor(Math.random() * 10 - 5),
-        };
+        const newPoint = { time: timeStr, ph: currentPh, tds: currentTds };
         const updated = [...prev, newPoint];
         return updated.length > 60 ? updated.slice(-60) : updated;
       });
-    }, 1000);
+    }
+  };
 
-    return () => clearInterval(interval);
-  }, [currentPh, currentTds]);
-
-  // Play alarm beep when danger detected and audio alarm is on
+  // Play alarm beep ketika bahaya terdeteksi
   useEffect(() => {
     if (audioToggleState && systemStatus === 'BAHAYA') {
       try {
@@ -224,3 +340,5 @@ export const SensorProvider = ({ children }) => {
     </SensorContext.Provider>
   );
 };
+
+
