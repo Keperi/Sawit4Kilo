@@ -562,32 +562,9 @@ export const SensorProvider = ({ children }) => {
     };
   }, [fetchHistory, handleNewSensorData, selectedNode, lastTimestamp]);
 
-  // Play alarm beep ketika bahaya terdeteksi
+  // Play alarm beep ketika bahaya terdeteksi (Dinonaktifkan sesuai permintaan: suara tit tit tit tidak diperlukan)
   useEffect(() => {
-    const quiet = isInQuietHours(notificationSettings);
-    const soundOn = notificationSettings ? notificationSettings.soundEnabled : true;
-
-    const shouldBeep = audioToggleState && systemStatus === 'BAHAYA';
-
-    if (shouldBeep && soundOn && !quiet) {
-      try {
-        if (!audioContextRef.current) {
-          audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        const ctx = audioContextRef.current;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = 880;
-        osc.type = 'square';
-        gain.gain.value = 0.05;
-        osc.start();
-        osc.stop(ctx.currentTime + 0.1);
-      } catch {
-        // Audio API not supported
-      }
-    }
+    // beep dinonaktifkan
   }, [audioToggleState, systemStatus, notificationSettings]);
 
   const updateThresholds = useCallback(({ phMin, phMax, tdsMax }) => {
