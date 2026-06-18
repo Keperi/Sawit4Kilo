@@ -336,11 +336,13 @@ test.describe('TC-06: Modal Pengaturan', () => {
     await page.click('text=Pengaturan');
     await page.waitForSelector('text=Audio & Alarm', { timeout: 5000 });
 
-    await page.click('text=Audio & Alarm');
-    await expect(page.locator('text=Pengaturan Suara').or(page.locator('text=Alarm'))).toBeVisible({ timeout: 3000 });
+    await page.getByRole('button', { name: 'Audio & Alarm' }).click();
+    // Target h2 heading di panel konten modal (bukan label sidebar/toggle)
+    await expect(page.getByRole('heading', { name: 'Audio & Alarm', level: 2 })).toBeVisible({ timeout: 3000 });
 
-    await page.click('text=Notifikasi');
-    await expect(page.locator('text=Jam Tenang').or(page.locator('text=Notifikasi'))).toBeVisible({ timeout: 3000 });
+    await page.getByRole('button', { name: 'Notifikasi' }).click();
+    // h2 heading "Notifikasi" di panel konten modal
+    await expect(page.getByRole('heading', { name: 'Notifikasi', level: 2 })).toBeVisible({ timeout: 3000 });
   });
 
 });
