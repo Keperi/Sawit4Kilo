@@ -41,6 +41,7 @@ const AudioToggleSwitch = () => {
 
   return (
     <button
+      data-testid="audio-toggle-btn"
       onClick={handleToggle}
       disabled={isMutating}
       role="switch"
