@@ -23,23 +23,30 @@ const DashboardPage = ({ setActivePage }) => {
     phThresholdMin,
     phThresholdMax,
     tdsThreshold,
+    nodes,
   } = useContext(SensorContext);
 
   const [showActionModal, setShowActionModal] = useState(false);
 
   const isDanger = systemStatus === 'BAHAYA';
+  const isOffline = systemStatus === 'OFFLINE';
   const isLoading = !currentPh && !currentTds;
 
-  const phVal = parseFloat(currentPh) || 0;
-  let phBadgeType = 'safe';
-  if (phVal < phThresholdMin) phBadgeType = 'danger';
-  else if (phVal > phThresholdMax) phBadgeType = 'warning';
+  const onlineNodesCount = nodes ? nodes.filter(n => n.online).length : 0;
+  const totalNodesCount = nodes ? nodes.length : 2;
 
-  const phBarCurrent = Math.round((phVal / 14) * 100);
-  const phBarColor =
+  const phVal = parseFloat(currentPh) || 0;
+  let phBadgeType = isOffline ? 'offline' : 'safe';
+  if (!isOffline) {
+    if (phVal < phThresholdMin) phBadgeType = 'danger';
+    else if (phVal > phThresholdMax) phBadgeType = 'warning';
+  }
+
+  const phBarCurrent = isOffline ? 0 : Math.round((phVal / 14) * 100);
+  const phBarColor = isOffline ? 'bg-slate-300' :
     phBadgeType === 'danger' ? 'bg-[#FF4628]' :
     phBadgeType === 'warning' ? 'bg-[#F59E0B]' : 'bg-[#22C55E]';
-  const phDelta =
+  const phDelta = isOffline ? 'Offline' :
     phBadgeType === 'danger'
       ? `${(phThresholdMin - phVal).toFixed(2)} di bawah normal`
       : phBadgeType === 'warning'
@@ -47,9 +54,9 @@ const DashboardPage = ({ setActivePage }) => {
       : 'Dalam rentang normal';
 
   const tdsVal = parseFloat(currentTds) || 0;
-  const tdsBarCurrent = Math.min(100, Math.round((tdsVal / 1500) * 100));
-  const tdsBarColor = isTdsAlert ? 'bg-[#FF4628]' : 'bg-[#22C55E]';
-  const tdsDelta = isTdsAlert
+  const tdsBarCurrent = isOffline ? 0 : Math.min(100, Math.round((tdsVal / 1500) * 100));
+  const tdsBarColor = isOffline ? 'bg-slate-300' : isTdsAlert ? 'bg-[#FF4628]' : 'bg-[#22C55E]';
+  const tdsDelta = isOffline ? 'Offline' : isTdsAlert
     ? `+${(tdsVal - tdsThreshold).toFixed(0)} ppm dari batas`
     : `${(tdsThreshold - tdsVal).toFixed(0)} ppm di bawah batas`;
 
@@ -80,6 +87,7 @@ const DashboardPage = ({ setActivePage }) => {
             message="Air asam terdeteksi"
             location={selectedNode}
             isDanger={isDanger}
+            systemStatus={systemStatus}
             sensorData={sensorData}
             onAction={() => setShowActionModal(true)}
           />
@@ -92,7 +100,7 @@ const DashboardPage = ({ setActivePage }) => {
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
               <MetricCard
                 title="Nilai pH"
-                value={currentPh}
+                value={isOffline ? '-' : currentPh}
                 unit="pH"
                 deltaText={phDelta}
                 barCurrent={phBarCurrent}
@@ -101,21 +109,21 @@ const DashboardPage = ({ setActivePage }) => {
                 legendRight="High"
                 badgeType={phBadgeType}
                 isLoading={isLoading}
-                isBidirectional={true}
+                isBidirectional={!isOffline}
               />
             </div>
 
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
               <MetricCard
                 title="Nilai TDS"
-                value={currentTds}
+                value={isOffline ? '-' : currentTds}
                 unit="ppm"
                 deltaText={tdsDelta}
                 barCurrent={tdsBarCurrent}
                 barColor={tdsBarColor}
                 legendLeft="Terukur"
                 legendRight="Batas aman"
-                badgeType={isTdsAlert ? 'warning' : 'safe'}
+                badgeType={isOffline ? 'offline' : (isTdsAlert ? 'warning' : 'safe')}
                 isLoading={isLoading}
               />
             </div>
@@ -123,14 +131,14 @@ const DashboardPage = ({ setActivePage }) => {
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
               <MetricCard
                 title="Node Aktif"
-                value="02"
+                value={String(onlineNodesCount).padStart(2, '0')}
                 unit="node"
-                deltaText="Semua node online"
-                barCurrent={100}
-                barColor="bg-[#22C55E]"
+                deltaText={onlineNodesCount === totalNodesCount ? "Semua node online" : `${onlineNodesCount} dari ${totalNodesCount} online`}
+                barCurrent={totalNodesCount > 0 ? Math.round((onlineNodesCount / totalNodesCount) * 100) : 0}
+                barColor={onlineNodesCount === totalNodesCount ? 'bg-[#22C55E]' : onlineNodesCount > 0 ? 'bg-[#F59E0B]' : 'bg-[#FF4628]'}
                 legendLeft="Online"
                 legendRight="Total node"
-                badgeType="safe"
+                badgeType={onlineNodesCount === totalNodesCount ? 'safe' : onlineNodesCount > 0 ? 'warning' : 'danger'}
                 isLoading={isLoading}
               />
             </div>
@@ -138,14 +146,14 @@ const DashboardPage = ({ setActivePage }) => {
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
               <MetricCard
                 title="Status Sistem"
-                value={isDanger ? 'KRITIS' : 'AMAN'}
+                value={isOffline ? 'OFFLINE' : isDanger ? 'KRITIS' : 'AMAN'}
                 unit=""
-                deltaText={isDanger ? 'Tindakan diperlukan' : 'Kualitas air baik'}
-                barCurrent={isDanger ? 85 : 15}
-                barColor={isDanger ? 'bg-[#FF4628]' : 'bg-[#22C55E]'}
+                deltaText={isOffline ? 'Koneksi terputus' : isDanger ? 'Tindakan diperlukan' : 'Kualitas air baik'}
+                barCurrent={isOffline ? 0 : isDanger ? 85 : 15}
+                barColor={isOffline ? 'bg-slate-300' : isDanger ? 'bg-[#FF4628]' : 'bg-[#22C55E]'}
                 legendLeft="Tingkat risiko"
                 legendRight="Threshold"
-                badgeType={isDanger ? 'danger' : 'safe'}
+                badgeType={isOffline ? 'offline' : isDanger ? 'danger' : 'safe'}
                 isLoading={isLoading}
               />
             </div>

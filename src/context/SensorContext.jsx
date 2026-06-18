@@ -190,9 +190,12 @@ export const SensorProvider = ({ children }) => {
   const [currentTds, setCurrentTds] = useState(400);
   const [lastTimestamp, setLastTimestamp] = useState(formatTime(new Date()));
 
+  const activeNodeObj = nodes.find(n => n.id === selectedNode);
+  const isNodeOffline = activeNodeObj ? !activeNodeObj.online : false;
+
   const isPhAlert = currentPh < phThresholdMin || currentPh > phThresholdMax;
   const isTdsAlert = currentTds > tdsThreshold;
-  const systemStatus = (isPhAlert || isTdsAlert) ? 'BAHAYA' : 'AMAN';
+  const systemStatus = isNodeOffline ? 'OFFLINE' : (isPhAlert || isTdsAlert) ? 'BAHAYA' : 'AMAN';
 
   useEffect(() => {
     if (systemStatus === 'BAHAYA') {
@@ -214,12 +217,18 @@ export const SensorProvider = ({ children }) => {
         else if (isPhDanger) msg = `pH Kritis terdeteksi: ${currentPh}.`;
         else msg = `TDS Kritis terdeteksi: ${currentTds} ppm.`;
         addNotification('DANGER', msg);
-      } else {
-        addNotification('SUCCESS', 'Kondisi air kembali normal dan Aman.');
+      } else if (systemStatus === 'OFFLINE') {
+        addNotification('OFFLINE', `Node ${selectedNode} terputus (Offline)`);
+      } else if (systemStatus === 'AMAN') {
+        if (prevStatusRef.current === 'BAHAYA') {
+          addNotification('SUCCESS', 'Kondisi air kembali normal dan Aman.');
+        } else if (prevStatusRef.current === 'OFFLINE') {
+          addNotification('SUCCESS', `Node ${selectedNode} kembali terhubung (Online)`);
+        }
       }
       prevStatusRef.current = systemStatus;
     }
-  }, [systemStatus, currentPh, currentTds, phThresholdMin, phThresholdMax, tdsThreshold, addNotification]);
+  }, [systemStatus, currentPh, currentTds, phThresholdMin, phThresholdMax, tdsThreshold, addNotification, selectedNode]);
 
   // Track nodes online/offline status changes for real-time notifications
   const prevNodesOnlineRef = useRef({
@@ -240,6 +249,30 @@ export const SensorProvider = ({ children }) => {
     });
   }, [nodes, addNotification]);
 
+  // Real-time offline detection: check every 3 seconds if any node has not sent data in the last 15 seconds
+  useEffect(() => {
+    const offlineChecker = setInterval(() => {
+      const now = Date.now();
+      setNodes((prevNodes) => {
+        let changed = false;
+        const nextNodes = prevNodes.map((node) => {
+          const lastUpdateTime = new Date(node.lastUpdate).getTime();
+          if (node.online && (now - lastUpdateTime > 15000)) {
+            changed = true;
+            return {
+              ...node,
+              online: false,
+            };
+          }
+          return node;
+        });
+        return changed ? nextNodes : prevNodes;
+      });
+    }, 3000);
+
+    return () => clearInterval(offlineChecker);
+  }, []);
+
   const audioContextRef = useRef(null);
 
   // Fetch initial history data from backend
@@ -248,6 +281,24 @@ export const SensorProvider = ({ children }) => {
       const response = await fetch(`${API_BASE_URL}/sensor-data?limit=100`);
       const result = await response.json();
       if (result.success && result.data && result.data.length > 0) {
+        const latestItem = result.data[0];
+        if (latestItem) {
+          const itemDate = parseESP32Timestamp(latestItem.timestamp, latestItem.createdAt);
+          const isOfflineOnLoad = (Date.now() - itemDate.getTime()) > 15000;
+          setNodes(prev => prev.map(node => {
+            if (node.id === selectedNode) {
+              return {
+                ...node,
+                online: !isOfflineOnLoad,
+                ph: latestItem.ph,
+                tds: latestItem.tds,
+                lastUpdate: itemDate,
+              };
+            }
+            return node;
+          }));
+        }
+
         // Map backend data format to frontend row format
         const mappedHistory = result.data.map((item, index) => {
           const itemDate = parseESP32Timestamp(item.timestamp, item.createdAt);

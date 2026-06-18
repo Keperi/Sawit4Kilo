@@ -62,7 +62,12 @@ const Header = memo(({
 
       <div className="flex items-center gap-3">
         {showStatusBadge && systemStatus && (
-          isDanger ? (
+          systemStatus === 'OFFLINE' ? (
+            <div data-testid="offline-badge" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 bg-slate-100 text-slate-500 text-[11px] font-bold select-none">
+              <AlertCircle size={12} strokeWidth={2} />
+              Offline
+            </div>
+          ) : isDanger ? (
             <button
               data-testid="danger-badge-btn"
               onClick={() => setShowDangerToast((prev) => !prev)}

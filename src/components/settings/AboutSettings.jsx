@@ -32,10 +32,10 @@ const AboutSettings = () => {
             <div>
               <div className="text-[10px] font-bold uppercase tracking-wider text-[#B9C8D7] mb-1">Status Sistem</div>
               <div className={`flex items-center gap-1.5 text-[13px] font-semibold ${
-                systemStatus === 'BAHAYA' ? 'text-[#FF4628]' : 'text-[#16A34A]'
+                systemStatus === 'OFFLINE' ? 'text-[#667085]' : systemStatus === 'BAHAYA' ? 'text-[#FF4628]' : 'text-[#16A34A]'
               }`}>
                 <div className={`w-[6px] h-[6px] rounded-full ${
-                  systemStatus === 'BAHAYA' ? 'bg-[#FF4628]' : 'bg-[#16A34A]'
+                  systemStatus === 'OFFLINE' ? 'bg-[#667085]' : systemStatus === 'BAHAYA' ? 'bg-[#FF4628]' : 'bg-[#16A34A]'
                 }`} />
                 {systemStatus}
               </div>

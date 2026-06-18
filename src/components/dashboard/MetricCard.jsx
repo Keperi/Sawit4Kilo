@@ -38,6 +38,8 @@ const MetricCard = memo(({
       ? 'text-[#FF4628]'
       : badgeType === 'warning'
       ? 'text-[#D97706]'
+      : badgeType === 'offline'
+      ? 'text-[#667085]'
       : 'text-[#16A34A]';
 
   const clampedBar = Math.min(100, Math.max(0, barCurrent));
