@@ -12,7 +12,7 @@ const Header = memo(({
   showNodeSelector = false,
   showStatusBadge = true,
 }) => {
-  const { showDangerToast, setShowDangerToast, notifications, setNotifications } = useContext(SensorContext);
+  const { showDangerToast, setShowDangerToast, notifications, setNotifications, dashboardMode } = useContext(SensorContext);
   const isDanger = systemStatus === 'BAHAYA';
   const isGreetingMode = !title;
 
@@ -47,16 +47,30 @@ const Header = memo(({
     >
       <div className="flex items-center gap-4">
         {isGreetingMode ? (
-          <>
-            <h2 className="text-[16px] font-bold text-[#202020] leading-tight">
-              Welcome back, {userName?.split(' ')[0] || 'Admin'}!
-            </h2>
-            <p className="text-[12px] text-[#B9C8D7]">
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-[16px] font-bold text-[#202020] leading-tight">
+                Welcome back, {userName?.split(' ')[0] || 'Admin'}!
+              </h2>
+              {dashboardMode === 'sandbox' && (
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase bg-amber-500/10 text-amber-600 border border-amber-500/20 select-none">
+                  Sandbox
+                </span>
+              )}
+            </div>
+            <p className="text-[12px] text-[#B9C8D7] mt-0.5">
               Monitoring KIDECO Mining Water Quality
             </p>
-          </>
+          </div>
         ) : (
-          <h1 className="text-[16px] font-bold text-[#202020]">{title}</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-[16px] font-bold text-[#202020]">{title}</h1>
+            {dashboardMode === 'sandbox' && (
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase bg-amber-500/10 text-amber-600 border border-amber-500/20 select-none">
+                Sandbox
+              </span>
+            )}
+          </div>
         )}
       </div>
 

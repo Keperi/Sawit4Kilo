@@ -77,6 +77,15 @@ export const SensorProvider = ({ children }) => {
     role: 'Environment Engineer',
     sessionActive: true
   });
+
+  const [dashboardMode, setDashboardMode] = useState(() => {
+    return localStorage.getItem('KIDECO_DASHBOARD_MODE') || 'realtime';
+  });
+
+  const changeDashboardMode = useCallback((mode) => {
+    setDashboardMode(mode);
+    localStorage.setItem('KIDECO_DASHBOARD_MODE', mode);
+  }, []);
   
   const [activeSensor, setActiveSensor] = useState('ALL');
   const [audioToggleState, setAudioToggleState] = useState(() => {
@@ -251,6 +260,8 @@ export const SensorProvider = ({ children }) => {
 
   // Real-time offline detection: check every 3 seconds if any node has not sent data in the last 15 seconds
   useEffect(() => {
+    if (dashboardMode === 'sandbox') return; // Skip offline detection in sandbox mode
+
     const offlineChecker = setInterval(() => {
       const now = Date.now();
       setNodes((prevNodes) => {
@@ -271,7 +282,7 @@ export const SensorProvider = ({ children }) => {
     }, 3000);
 
     return () => clearInterval(offlineChecker);
-  }, []);
+  }, [dashboardMode]);
 
   const audioContextRef = useRef(null);
 
@@ -518,6 +529,8 @@ export const SensorProvider = ({ children }) => {
 
   // Setup Koneksi Socket.io dan simulator
   useEffect(() => {
+    if (dashboardMode === 'sandbox') return; // Skip connection in sandbox mode
+
     fetchHistory(); // Ambil riwayat di awal
 
     const socket = socketIO(SOCKET_URL);
@@ -611,7 +624,91 @@ export const SensorProvider = ({ children }) => {
       clearInterval(fallbackInterval);
       clearInterval(simulatorInterval);
     };
-  }, [fetchHistory, handleNewSensorData, selectedNode, lastTimestamp]);
+  }, [fetchHistory, handleNewSensorData, selectedNode, lastTimestamp, dashboardMode]);
+
+  // Sandbox Simulator Effect
+  useEffect(() => {
+    if (dashboardMode !== 'sandbox') return;
+
+    const interval = setInterval(() => {
+      const now = new Date();
+      const timeStr = formatTime(now);
+
+      // Generate next values for selectedNode
+      let nextPh = currentPh;
+      setCurrentPh((prev) => {
+        const change = Math.random() * 0.4 - 0.2;
+        let next = parseFloat((prev + change).toFixed(1));
+        if (next < 3.0) next = 3.0;
+        if (next > 10.0) next = 10.0;
+        nextPh = next;
+        return next;
+      });
+
+      let nextTds = currentTds;
+      setCurrentTds((prev) => {
+        const change = Math.floor(Math.random() * 40 - 20);
+        let next = prev + change;
+        if (next < 150) next = 150;
+        if (next > 1300) next = 1300;
+        nextTds = next;
+        return next;
+      });
+
+      setLastTimestamp(timeStr);
+
+      setChartData((prev) => {
+        const newPoint = { time: timeStr, ph: nextPh, tds: nextTds };
+        const updated = [...prev, newPoint];
+        return updated.length > 60 ? updated.slice(-60) : updated;
+      });
+
+      setNodes((prev) =>
+        prev.map((node) => {
+          if (node.id === selectedNode) {
+            const miniTime = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const newPoint = { time: miniTime, ph: nextPh, tds: nextTds };
+            const updatedChart = [...node.chartData, newPoint];
+            const trimmedChart = updatedChart.length > 30 ? updatedChart.slice(-30) : updatedChart;
+            return {
+              ...node,
+              online: true,
+              ph: nextPh,
+              tds: nextTds,
+              lastUpdate: now,
+              chartData: trimmedChart,
+            };
+          } else {
+            const phChange = Math.random() * 0.2 - 0.1;
+            let nPh = parseFloat((node.ph + phChange).toFixed(1));
+            if (nPh < 4.0) nPh = 4.0;
+            if (nPh > 9.0) nPh = 9.0;
+
+            const tdsChange = Math.floor(Math.random() * 20 - 10);
+            let nTds = node.tds + tdsChange;
+            if (nTds < 100) nTds = 100;
+            if (nTds > 800) nTds = 800;
+
+            const miniTime = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const newPoint = { time: miniTime, ph: nPh, tds: nTds };
+            const updatedChart = [...node.chartData, newPoint];
+            const trimmedChart = updatedChart.length > 30 ? updatedChart.slice(-30) : updatedChart;
+
+            return {
+              ...node,
+              online: true,
+              ph: nPh,
+              tds: nTds,
+              lastUpdate: now,
+              chartData: trimmedChart,
+            };
+          }
+        })
+      );
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [dashboardMode, selectedNode, currentPh, currentTds]);
 
   // Play alarm beep ketika bahaya terdeteksi (Dinonaktifkan sesuai permintaan: suara tit tit tit tidak diperlukan)
   useEffect(() => {
@@ -684,6 +781,9 @@ export const SensorProvider = ({ children }) => {
         notifications,
         setNotifications,
         addNotification,
+
+        dashboardMode,
+        changeDashboardMode,
       }}
     >
       {children}
