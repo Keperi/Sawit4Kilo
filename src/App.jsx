@@ -3,6 +3,7 @@ import Sidebar from './components/layout/Sidebar';
 import DashboardPage from './pages/DashboardPage';
 import HistoryPage from './pages/HistoryPage';
 import ConfigPage from './pages/ConfigPage';
+import Settings from './pages/Settings';
 import GlobalDangerAlert from './components/layout/GlobalDangerAlert';
 
 function App() {
@@ -16,6 +17,8 @@ function App() {
         return <HistoryPage />;
       case 'config':
         return <ConfigPage />;
+      case 'settings':
+        return <Settings />;
       default:
         return <DashboardPage setActivePage={setActivePage} />;
     }
