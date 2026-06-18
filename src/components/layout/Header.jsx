@@ -40,6 +40,7 @@ const Header = memo(({
         {showStatusBadge && systemStatus && (
           isDanger ? (
             <button
+              data-testid="danger-badge-btn"
               onClick={() => setShowDangerToast((prev) => !prev)}
               title="Klik untuk tampilkan/sembunyikan detail peringatan"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#FF4628]/20 bg-[#FF4628]/10 text-[#FF4628] text-[11px] font-bold cursor-pointer hover:bg-[#FF4628]/20 transition-all select-none active:scale-95 outline-none shadow-3xs"
@@ -48,7 +49,7 @@ const Header = memo(({
               Bahaya
             </button>
           ) : (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#16A34A]/20 bg-[#16A34A]/10 text-[#16A34A] text-[11px] font-bold">
+            <div data-testid="safe-badge" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#16A34A]/20 bg-[#16A34A]/10 text-[#16A34A] text-[11px] font-bold">
               <CheckCircle size={12} strokeWidth={2} />
               Aman
             </div>

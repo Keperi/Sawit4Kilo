@@ -93,7 +93,7 @@ const GlobalDangerAlert = ({ activePage }) => {
   }
 
   return (
-    <div className="fixed top-[84px] right-6 z-50 animate-bounce-in">
+    <div data-testid="danger-toast" className="fixed top-[84px] right-6 z-50 animate-bounce-in">
       <div className="bg-[#FEF9F8] border-2 border-[#E8533A] rounded-[12px] p-5 shadow-2xl flex items-start gap-4 max-w-sm relative">
         <div className="w-[40px] h-[40px] rounded-full bg-[#FEE8E2] flex items-center justify-center shrink-0">
           <AlertCircle size={24} strokeWidth={2.5} className="text-[#C84B2F] animate-pulse" />
@@ -107,6 +107,7 @@ const GlobalDangerAlert = ({ activePage }) => {
           </p>
         </div>
         <button
+          data-testid="danger-toast-close"
           onClick={() => setShowDangerToast(false)}
           className="absolute top-3 right-3 text-[#C84B2F]/60 hover:text-[#9B2617] hover:bg-[#FEE8E2] rounded-lg p-1 transition-all duration-200 outline-none cursor-pointer active:scale-90"
           title="Tutup Peringatan"
