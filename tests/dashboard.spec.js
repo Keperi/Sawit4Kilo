@@ -6,43 +6,30 @@
 
 import { test, expect } from '@playwright/test';
 
-// Helper: Force system status to BAHAYA by setting pH minimum threshold
-// higher than the simulated pH value (simulator runs ~6.0-8.0 normally)
+// ─────────────────────────────────────────────────────────────────────────────
+// HELPER FUNCTIONS
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Paksa status BAHAYA dengan inject localStorage secara langsung.
+ * Threshold pH minimum di-set ke 9.5 agar sensor (6.0-8.0) selalu BAHAYA.
+ * Ini jauh lebih cepat dan stabil daripada navigasi melalui UI Settings.
+ */
 async function forceDangerStatus(page) {
-  // Navigate to Settings > Threshold
-  await page.click('text=Alex Johnson');
-  await page.waitForTimeout(300);
-  await page.click('text=Pengaturan');
-  await page.waitForSelector('text=Threshold', { timeout: 5000 });
-  await page.click('text=Threshold');
-
-  // Set minimum pH very high (e.g. 9.5) so current value triggers BAHAYA
-  const phMinInput = page.locator('input').nth(0);
-  await phMinInput.clear();
-  await phMinInput.fill('9.5');
-  await page.click('text=Simpan Threshold');
-  await page.waitForTimeout(1500);
-
-  // Close settings modal
-  await page.keyboard.press('Escape');
-  await page.waitForTimeout(500);
+  await page.evaluate(() => {
+    localStorage.setItem('KIDECO_PH_MIN', '9.5');
+  });
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.waitForTimeout(2000); // Tunggu sensor context re-evaluate
 }
 
-// Helper: Reset threshold to normal
+/**
+ * Reset threshold ke nilai normal via localStorage.
+ */
 async function resetToNormal(page) {
-  await page.click('text=Alex Johnson');
-  await page.waitForTimeout(300);
-  await page.click('text=Pengaturan');
-  await page.waitForSelector('text=Threshold', { timeout: 5000 });
-  await page.click('text=Threshold');
-
-  const phMinInput = page.locator('input').nth(0);
-  await phMinInput.clear();
-  await phMinInput.fill('4.5');
-  await page.click('text=Simpan Threshold');
-  await page.waitForTimeout(1500);
-  await page.keyboard.press('Escape');
-  await page.waitForTimeout(500);
+  await page.evaluate(() => {
+    localStorage.setItem('KIDECO_PH_MIN', '4.5');
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
