@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 
 const StatusBadge = memo(({ status, className = '' }) => {
-  let badgeClasses = 'bg-[#F5F5F5] text-[#B9C8D7] border border-[#B9C8D7]/30';
+  let badgeClasses = 'bg-[#F7F8FA] text-[#B9C8D7] border border-[#EAECF0]';
   let label = status;
 
   if (status === 'AMAN') {
@@ -17,13 +17,13 @@ const StatusBadge = memo(({ status, className = '' }) => {
     badgeClasses = 'bg-[#DCFCE7] text-[#166534]';
     label = 'Online';
   } else if (status === 'OFFLINE') {
-    badgeClasses = 'bg-[#F5F5F5] text-[#B9C8D7] border border-[#B9C8D7]/30';
+    badgeClasses = 'bg-[#F7F8FA] text-[#B9C8D7] border border-[#EAECF0]';
     label = 'Offline';
   }
 
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-[20px] text-[10px] font-bold ${badgeClasses} ${className}`}
+      className={`inline-flex items-center gap-1.5 font-semibold rounded-full px-2.5 py-0.5 text-[10px] uppercase tracking-wide ${badgeClasses} ${className}`}
     >
       {label}
     </span>

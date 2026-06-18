@@ -6,7 +6,7 @@ const TablePaginationControl = ({ totalLogs, itemsPerPage = 15, currentPage, onP
   const totalPages = Math.ceil(totalLogs / itemsPerPage);
 
   if (totalPages <= 1) return (
-    <div className="px-6 py-4 text-sm text-[#B9C8D7] font-normal border-t border-[#B9C8D7]/30 bg-white rounded-b-[10px]">
+    <div className="px-6 py-4 text-[12px] text-[#B9C8D7] font-normal">
       Menampilkan {totalLogs} dari {totalLogs} entri
     </div>
   );
@@ -60,7 +60,7 @@ const TablePaginationControl = ({ totalLogs, itemsPerPage = 15, currentPage, onP
                 className={`
                   min-w-[30px] h-7 rounded-[8px] text-[12px] font-bold flex items-center justify-center cursor-pointer transition-all duration-150 border
                   ${page === currentPage
-                    ? 'bg-[#FF4628] text-white border-[#FF4628] shadow-sm'
+                    ? 'bg-[#FF4628] text-white border-[#FF4628]'
                     : 'bg-white text-[#B9C8D7] border-[#B9C8D7]/30 hover:bg-[#F5F5F5] hover:text-[#202020]'}
                 `}
               >

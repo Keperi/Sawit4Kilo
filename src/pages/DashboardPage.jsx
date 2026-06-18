@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { SensorContext } from '../context/SensorContext';
 import Header from '../components/layout/Header';
 import MetricCard from '../components/dashboard/MetricCard';
@@ -7,6 +7,7 @@ import TopHighestPhCard from '../components/dashboard/TopHighestPhCard';
 import RecentLogsTable from '../components/dashboard/RecentLogsTable';
 import StatusBar from '../components/layout/StatusBar';
 import AlertBanner from '../components/dashboard/AlertBanner';
+import ActionModal from '../components/dashboard/ActionModal';
 
 const DashboardPage = ({ setActivePage }) => {
   const {
@@ -19,18 +20,20 @@ const DashboardPage = ({ setActivePage }) => {
     isTdsAlert,
     lastTimestamp,
     historyData,
+    phThresholdMin,
+    tdsThreshold,
   } = useContext(SensorContext);
+
+  const [showActionModal, setShowActionModal] = useState(false);
 
   const isDanger = systemStatus === 'BAHAYA';
   const isLoading = !currentPh && !currentTds;
 
-  // ── pH status ──────────────────────────────────────────────
   const phVal = parseFloat(currentPh) || 0;
   let phBadgeType = 'safe';
   if (phVal < 6.5) phBadgeType = 'danger';
   else if (phVal > 8.5) phBadgeType = 'warning';
 
-  // Bar: map pH 0–14 scale to 0–100%
   const phBarCurrent = Math.round((phVal / 14) * 100);
   const phBarColor =
     phBadgeType === 'danger' ? 'bg-[#FF4628]' :
@@ -42,7 +45,6 @@ const DashboardPage = ({ setActivePage }) => {
       ? `${(phVal - 8.5).toFixed(1)} di atas normal`
       : 'Dalam rentang normal';
 
-  // ── TDS status ────────────────────────────────────────────
   const tdsVal = parseFloat(currentTds) || 0;
   const tdsBarCurrent = Math.min(100, Math.round((tdsVal / 1500) * 100));
   const tdsBarColor = isTdsAlert ? 'bg-[#F59E0B]' : 'bg-[#22C55E]';
@@ -50,9 +52,18 @@ const DashboardPage = ({ setActivePage }) => {
     ? `+${(tdsVal - 500).toFixed(0)} ppm dari batas`
     : `${(500 - tdsVal).toFixed(0)} ppm di bawah batas`;
 
+  const sensorData = {
+    ph: currentPh,
+    tds: currentTds,
+    nodeId: selectedNode,
+    status: systemStatus,
+    phMin: phThresholdMin,
+    tdsMax: tdsThreshold,
+    history: historyData,
+  };
+
   return (
     <div className="flex flex-col h-full bg-[#F5F5F5] overflow-hidden">
-      {/* ── Header ── */}
       <Header
         selectedNode={selectedNode}
         onNodeChange={setSelectedNode}
@@ -61,22 +72,22 @@ const DashboardPage = ({ setActivePage }) => {
         showNodeSelector
       />
 
-      {/* ── Main Scrollable Content ── */}
       <div className="flex-1 overflow-y-auto p-4 md:p-6">
         <div className="bg-white rounded-[16px] shadow-sm border border-[#EAECF0] p-4 md:p-6 flex flex-col gap-[18px] min-h-full">
 
-          {/* ── Alert Banner ── */}
-          <AlertBanner message="Air asam terdeteksi" location={selectedNode} isDanger={isDanger} />
+          <AlertBanner
+            message="Air asam terdeteksi"
+            location={selectedNode}
+            isDanger={isDanger}
+            sensorData={sensorData}
+            onAction={() => setShowActionModal(true)}
+          />
 
-          {/* ── Top 5 pH Anomali ── */}
           <div className="w-full">
             <TopHighestPhCard historyData={historyData} />
           </div>
 
-          {/* Row 1: 4 Metric Cards */}
           <div className="grid grid-cols-12 gap-[14px]">
-
-            {/* pH */}
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
               <MetricCard
                 title="Nilai pH"
@@ -93,7 +104,6 @@ const DashboardPage = ({ setActivePage }) => {
               />
             </div>
 
-            {/* TDS */}
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
               <MetricCard
                 title="Nilai TDS"
@@ -109,7 +119,6 @@ const DashboardPage = ({ setActivePage }) => {
               />
             </div>
 
-            {/* Node Aktif */}
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
               <MetricCard
                 title="Node Aktif"
@@ -125,7 +134,6 @@ const DashboardPage = ({ setActivePage }) => {
               />
             </div>
 
-            {/* Status Sistem */}
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
               <MetricCard
                 title="Status Sistem"
@@ -140,15 +148,12 @@ const DashboardPage = ({ setActivePage }) => {
                 isLoading={isLoading}
               />
             </div>
-
           </div>
 
-          {/* ── Real-time Chart ── */}
           <div className="w-full">
             <TelemetryChartContainer />
           </div>
 
-          {/* ── Recent Logs ── */}
           <div className="pb-2">
             <RecentLogsTable data={historyData} setActivePage={setActivePage} />
           </div>
@@ -156,11 +161,16 @@ const DashboardPage = ({ setActivePage }) => {
         </div>
       </div>
 
-      {/* ── Bottom Status Bar ── */}
       <StatusBar
         selectedNode={selectedNode}
         lastTimestamp={lastTimestamp}
         systemStatus={systemStatus}
+      />
+
+      <ActionModal
+        isOpen={showActionModal}
+        onClose={() => setShowActionModal(false)}
+        sensorData={sensorData}
       />
     </div>
   );

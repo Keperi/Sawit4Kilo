@@ -6,12 +6,24 @@ export const SensorContext = createContext();
 const API_BASE_URL = 'http://localhost:3000/api';
 const SOCKET_URL = 'http://localhost:3000';
 
-// Format time as HH:MM:SS
+const generateInitialChartData = () => {
+  const data = [];
+  const now = new Date();
+  for (let i = 30; i >= 0; i--) {
+    const time = new Date(now.getTime() - i * 60000);
+    data.push({
+      time: time.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+      ph: parseFloat((Math.random() * 4 + 3).toFixed(1)),
+      tds: Math.floor(Math.random() * 800 + 400),
+    });
+  }
+  return data;
+};
+
 const formatTime = (date) => {
   return date.toLocaleTimeString('id-ID', { hour12: false });
 };
 
-// Format timestamp for history table
 const formatTimestamp = (date) => {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -22,18 +34,25 @@ const formatTimestamp = (date) => {
   return `${y}-${m}-${d} ${h}:${min}:${s}`;
 };
 
+const getNodeStatus = (node, phThresholdMin, phThresholdMax, tdsThreshold) => {
+  if (!node.online) return 'OFFLINE';
+  const isPhDanger = node.ph < phThresholdMin || node.ph > phThresholdMax;
+  const isTdsDanger = node.tds > tdsThreshold;
+  return (isPhDanger || isTdsDanger) ? 'BAHAYA' : 'AMAN';
+};
+
 export const SensorProvider = ({ children }) => {
-  // New States based on specs
-  const [userState, setUserState] = useState({
+  const [userState] = useState({
     name: 'Admin KIDECO',
     role: 'Environment Engineer',
     sessionActive: true
   });
   
-  const [activeSensor, setActiveSensor] = useState('ALL'); // 'ALL' | 'PH' | 'TDS'
+  const [activeSensor, setActiveSensor] = useState('ALL');
   const [audioToggleState, setAudioToggleState] = useState(false);
+  const [allAlarmsMuted, setAllAlarmsMuted] = useState(false);
+  const [buzzerActive, setBuzzerActive] = useState(false);
 
-  // Thresholds
   const [phThresholdMin, setPhThresholdMin] = useState(() => {
     const saved = localStorage.getItem('KIDECO_PH_MIN');
     return saved ? parseFloat(saved) : 4.5;
@@ -42,25 +61,47 @@ export const SensorProvider = ({ children }) => {
     const saved = localStorage.getItem('KIDECO_PH_MAX');
     return saved ? parseFloat(saved) : 9.0;
   });
+  const [tdsThreshold, setTdsThreshold] = useState(() => {
+    const saved = localStorage.getItem('KIDECO_TDS_MAX');
+    return saved ? parseFloat(saved) : 800;
+  });
 
-  // Current sensor values
   const [currentPh, setCurrentPh] = useState(7.0);
   const [currentTds, setCurrentTds] = useState(400);
   const [lastTimestamp, setLastTimestamp] = useState(formatTime(new Date()));
 
-  // System status derived
   const isPhAlert = currentPh < phThresholdMin || currentPh > phThresholdMax;
-  const isTdsAlert = currentTds > 800; // Static value as per new PRD
+  const isTdsAlert = currentTds > tdsThreshold;
   const systemStatus = (isPhAlert || isTdsAlert) ? 'BAHAYA' : 'AMAN';
 
-  // Audio alarm
   const audioContextRef = useRef(null);
 
-  // Chart data and History data
   const [chartData, setChartData] = useState([]);
   const [historyData, setHistoryData] = useState([]);
+  
+  const [nodes, setNodes] = useState([
+    {
+      id: 'KDC01',
+      name: 'KDC01',
+      location: 'Kolam Pengendap 1',
+      online: true,
+      ph: 3.2,
+      tds: 1200,
+      lastUpdate: new Date(),
+      chartData: generateInitialChartData(),
+    },
+    {
+      id: 'KDC02',
+      name: 'KDC02',
+      location: 'Kolam Pengendap 2',
+      online: false,
+      ph: 7.0,
+      tds: 240,
+      lastUpdate: new Date(Date.now() - 45000),
+      chartData: generateInitialChartData(),
+    },
+  ]);
 
-  // Selected node
   const [selectedNode, setSelectedNode] = useState('KDC01');
 
   // Fetch initial history data from backend
@@ -168,11 +209,125 @@ export const SensorProvider = ({ children }) => {
       return updated.length > 60 ? updated.slice(-60) : updated;
     });
 
+    setNodes((prev) =>
+      prev.map((node) => {
+        if (node.id === data.nodeId) {
+          const miniTime = itemDate.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+          const newPoint = { time: miniTime, ph: data.ph, tds: data.tds };
+          const updatedChart = [...node.chartData, newPoint];
+          const trimmedChart = updatedChart.length > 30 ? updatedChart.slice(-30) : updatedChart;
+          return {
+            ...node,
+            online: true,
+            ph: data.ph,
+            tds: data.tds,
+            lastUpdate: itemDate,
+            chartData: trimmedChart,
+          };
+        }
+        return node;
+      })
+    );
+
     // Refresh history
     fetchHistory();
   }, [fetchHistory]);
 
-  // Setup Koneksi Socket.io
+  // Fallback simulator jika API Utama atau Database offline / kosong
+  const fetchDummyFallback = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sensor-data/dummy`);
+      const result = await response.json();
+      if (result.success && result.data) {
+        const item = result.data;
+        const itemDate = new Date(item.timestamp);
+        const timeStr = formatTime(itemDate);
+
+        setCurrentPh(item.ph);
+        setCurrentTds(item.tds);
+        setLastTimestamp(timeStr);
+
+        setChartData((prev) => {
+          const newPoint = { time: timeStr, ph: item.ph, tds: item.tds };
+          const updated = [...prev, newPoint];
+          return updated.length > 60 ? updated.slice(-60) : updated;
+        });
+
+        setNodes((prev) =>
+          prev.map((node) => {
+            if (node.id === item.nodeId || node.id === selectedNode) {
+              const miniTime = itemDate.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+              const newPoint = { time: miniTime, ph: item.ph, tds: item.tds };
+              const updatedChart = [...node.chartData, newPoint];
+              const trimmedChart = updatedChart.length > 30 ? updatedChart.slice(-30) : updatedChart;
+              return {
+                ...node,
+                online: true,
+                ph: item.ph,
+                tds: item.tds,
+                lastUpdate: itemDate,
+                chartData: trimmedChart,
+              };
+            }
+            return node;
+          })
+        );
+      }
+    } catch (err) {
+      // Offline local simulation generator jika backend mati total
+      const now = new Date();
+      const timeStr = formatTime(now);
+      
+      let nextPh = currentPh;
+      setCurrentPh((prev) => {
+        const change = Math.random() * 0.4 - 0.2;
+        let next = parseFloat((prev + change).toFixed(1));
+        if (next < 2.0) next = 2.0;
+        if (next > 10.0) next = 10.0;
+        nextPh = next;
+        return next;
+      });
+
+      let nextTds = currentTds;
+      setCurrentTds((prev) => {
+        const change = Math.floor(Math.random() * 30 - 15);
+        let next = prev + change;
+        if (next < 100) next = 100;
+        if (next > 1600) next = 1600;
+        nextTds = next;
+        return next;
+      });
+
+      setLastTimestamp(timeStr);
+      setChartData((prev) => {
+        const newPoint = { time: timeStr, ph: nextPh, tds: nextTds };
+        const updated = [...prev, newPoint];
+        return updated.length > 60 ? updated.slice(-60) : updated;
+      });
+
+      setNodes((prev) =>
+        prev.map((node) => {
+          if (node.id === selectedNode) {
+            const miniTime = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const newPoint = { time: miniTime, ph: nextPh, tds: nextTds };
+            const updatedChart = [...node.chartData, newPoint];
+            const trimmedChart = updatedChart.length > 30 ? updatedChart.slice(-30) : updatedChart;
+            return {
+              ...node,
+              online: true,
+              ph: nextPh,
+              tds: nextTds,
+              lastUpdate: now,
+              chartData: trimmedChart,
+            };
+          }
+          return node;
+        })
+      );
+    }
+  };
+
+  // Setup Koneksi Socket.io dan simulator
   useEffect(() => {
     fetchHistory(); // Ambil riwayat di awal
 
@@ -209,61 +364,65 @@ export const SensorProvider = ({ children }) => {
       }
     }, 3000);
 
+    // Simulator untuk Node KDC02 (atau node selain yang aktif/live jika offline)
+    const simulatorInterval = setInterval(() => {
+      const now = new Date();
+      setNodes((prev) =>
+        prev.map((node) => {
+          // Node aktif (misal KDC01) di-update lewat WS/polling, jadi skip simulator jika online
+          if (node.id === selectedNode && (socket.connected || lastTimestamp)) {
+            // Biarkan di-update oleh handleNewSensorData
+            return node;
+          }
+
+          // Update simulasi untuk KDC02
+          if (node.id === 'KDC02') {
+            const shouldGoOffline = Math.random() < 0.02;
+            const shouldComeOnline = !node.online && Math.random() < 0.05;
+
+            let newOnline = node.online;
+            if (shouldGoOffline) newOnline = false;
+            if (shouldComeOnline) newOnline = true;
+
+            if (!newOnline) {
+              return { ...node, online: false };
+            }
+
+            const phChange = Math.random() * 0.4 - 0.2;
+            let newPh = parseFloat((node.ph + phChange).toFixed(1));
+            if (newPh < 2.0) newPh = 2.0;
+            if (newPh > 10.0) newPh = 10.0;
+
+            const tdsChange = Math.floor(Math.random() * 30 - 15);
+            let newTds = node.tds + tdsChange;
+            if (newTds < 100) newTds = 100;
+            if (newTds > 1600) newTds = 1600;
+
+            const miniTime = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const newPoint = { time: miniTime, ph: newPh, tds: newTds };
+            const updatedChart = [...node.chartData, newPoint];
+            const trimmedChart = updatedChart.length > 30 ? updatedChart.slice(-30) : updatedChart;
+
+            return {
+              ...node,
+              online: true,
+              ph: newPh,
+              tds: newTds,
+              lastUpdate: now,
+              chartData: trimmedChart,
+            };
+          }
+          return node;
+        })
+      );
+    }, 3000);
+
     return () => {
       socket.disconnect();
       clearInterval(fallbackInterval);
+      clearInterval(simulatorInterval);
     };
-  }, [fetchHistory, handleNewSensorData]);
-
-  // Fallback simulator jika API Utama atau Database offline / kosong
-  const fetchDummyFallback = async () => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/sensor-data/dummy`);
-      const result = await response.json();
-      if (result.success && result.data) {
-        const item = result.data;
-        const itemDate = new Date(item.timestamp);
-        const timeStr = formatTime(itemDate);
-
-        setCurrentPh(item.ph);
-        setCurrentTds(item.tds);
-        setLastTimestamp(timeStr);
-
-        setChartData((prev) => {
-          const newPoint = { time: timeStr, ph: item.ph, tds: item.tds };
-          const updated = [...prev, newPoint];
-          return updated.length > 60 ? updated.slice(-60) : updated;
-        });
-      }
-    } catch (err) {
-      // Offline local simulation generator jika backend mati total
-      const now = new Date();
-      const timeStr = formatTime(now);
-      
-      setCurrentPh((prev) => {
-        const change = Math.random() * 0.4 - 0.2;
-        let next = parseFloat((prev + change).toFixed(1));
-        if (next < 2.0) next = 2.0;
-        if (next > 10.0) next = 10.0;
-        return next;
-      });
-
-      setCurrentTds((prev) => {
-        const change = Math.floor(Math.random() * 30 - 15);
-        let next = prev + change;
-        if (next < 100) next = 100;
-        if (next > 1600) next = 1600;
-        return next;
-      });
-
-      setLastTimestamp(timeStr);
-      setChartData((prev) => {
-        const newPoint = { time: timeStr, ph: currentPh, tds: currentTds };
-        const updated = [...prev, newPoint];
-        return updated.length > 60 ? updated.slice(-60) : updated;
-      });
-    }
-  };
+  }, [fetchHistory, handleNewSensorData, selectedNode, lastTimestamp]);
 
   // Play alarm beep ketika bahaya terdeteksi
   useEffect(() => {
@@ -288,11 +447,15 @@ export const SensorProvider = ({ children }) => {
     }
   }, [audioToggleState, systemStatus, currentPh, currentTds]);
 
-  const updateThresholds = useCallback(({ phMin, phMax }) => {
+  const updateThresholds = useCallback(({ phMin, phMax, tdsMax }) => {
     setPhThresholdMin(phMin);
     setPhThresholdMax(phMax);
     localStorage.setItem('KIDECO_PH_MIN', String(phMin));
     localStorage.setItem('KIDECO_PH_MAX', String(phMax));
+    if (tdsMax !== undefined) {
+      setTdsThreshold(tdsMax);
+      localStorage.setItem('KIDECO_TDS_MAX', String(tdsMax));
+    }
   }, []);
 
   const toggleAudioAlarm = useCallback(() => {
@@ -302,14 +465,16 @@ export const SensorProvider = ({ children }) => {
   return (
     <SensorContext.Provider
       value={{
-        // New Spec States
         userState,
         activeSensor,
         setActiveSensor,
         audioToggleState,
         setAudioToggleState,
+        allAlarmsMuted,
+        setAllAlarmsMuted,
+        buzzerActive,
+        setBuzzerActive,
         
-        // Current readings
         currentPh,
         currentTds,
         lastTimestamp,
@@ -317,28 +482,27 @@ export const SensorProvider = ({ children }) => {
         isPhAlert,
         isTdsAlert,
 
-        // Thresholds
         phThresholdMin,
         phThresholdMax,
+        tdsThreshold,
+        setTdsThreshold,
         updateThresholds,
 
-        // Audio
         toggleAudioAlarm,
 
-        // Chart
         chartData,
 
-        // History
         historyData,
 
-        // Node
         selectedNode,
         setSelectedNode,
+
+        nodes,
+        setNodes,
+        getNodeStatus: (node) => getNodeStatus(node, phThresholdMin, phThresholdMax, tdsThreshold),
       }}
     >
       {children}
     </SensorContext.Provider>
   );
 };
-
-

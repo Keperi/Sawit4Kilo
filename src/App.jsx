@@ -4,10 +4,14 @@ import DashboardPage from './pages/DashboardPage';
 import HistoryPage from './pages/HistoryPage';
 import ConfigPage from './pages/ConfigPage';
 import Settings from './pages/Settings';
+import DevicePage from './pages/DevicePage';
+import AnalyticsPage from './pages/AnalyticsPage';
+import SettingsPage from './pages/SettingsPage';
 import GlobalDangerAlert from './components/layout/GlobalDangerAlert';
 
 function App() {
   const [activePage, setActivePage] = useState('dashboard');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const renderPage = () => {
     switch (activePage) {
@@ -19,6 +23,10 @@ function App() {
         return <ConfigPage />;
       case 'settings':
         return <Settings />;
+      case 'device':
+        return <DevicePage setActivePage={setActivePage} />;
+      case 'analytics':
+        return <AnalyticsPage />;
       default:
         return <DashboardPage setActivePage={setActivePage} />;
     }
@@ -26,16 +34,19 @@ function App() {
 
   return (
     <div className="w-full min-h-screen bg-brand-bg text-neutral-title flex flex-col md:flex-row overflow-hidden relative">
-      {/* Fixed Sidebar */}
-      <Sidebar activePage={activePage} setActivePage={setActivePage} />
+      <Sidebar
+        activePage={activePage}
+        setActivePage={setActivePage}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+      />
 
-      {/* Main Content — offset by sidebar width on desktop */}
       <main className="md:ml-[260px] flex-1 flex flex-col h-screen overflow-hidden">
         {renderPage()}
       </main>
 
-      {/* Global Alert for non-dashboard pages */}
       <GlobalDangerAlert activePage={activePage} />
+
+      <SettingsPage isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 }

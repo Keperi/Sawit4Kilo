@@ -16,11 +16,10 @@ const FilterToolbar = ({
 }) => {
   return (
     <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 w-full">
-      {/* Left side: Filters grouped horizontally */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 mr-2">
           <FilterLines size={16} className="text-[#B9C8D7]" />
-          <span className="text-xs font-bold text-slate-500 uppercase tracking-widest hidden sm:block">
+          <span className="text-[11px] font-bold text-[#B9C8D7] uppercase tracking-widest hidden sm:block">
             Filter Log
           </span>
         </div>
@@ -30,18 +29,18 @@ const FilterToolbar = ({
           type="date"
           value={dateFrom}
           onChange={(e) => onDateFromChange(e.target.value)}
-          className="h-10 px-3 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 outline-none shadow-sm transition-all focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 max-w-[140px]"
+          className="h-[38px] px-3 bg-white border border-[#EAECF0] rounded-[8px] text-[13px] font-medium text-[#202020] outline-none transition-all focus:border-[#FF4628] max-w-[140px]"
           title="Dari Tanggal"
         />
 
-        <span className="text-slate-400 text-sm">—</span>
+        <span className="text-[#B9C8D7] text-[13px]">—</span>
 
         <input
           id="filter-date-to"
           type="date"
           value={dateTo}
           onChange={(e) => onDateToChange(e.target.value)}
-          className="h-10 px-3 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 outline-none shadow-sm transition-all focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 max-w-[140px]"
+          className="h-[38px] px-3 bg-white border border-[#EAECF0] rounded-[8px] text-[13px] font-medium text-[#202020] outline-none transition-all focus:border-[#FF4628] max-w-[140px]"
           title="Hingga Tanggal"
         />
 
@@ -51,25 +50,24 @@ const FilterToolbar = ({
 
         <Button
           id="filter-apply"
-          variant="primary"
+          color="primary"
           iconLeading={<SearchMd />}
           onClick={onApplyFilter}
-          className="h-10 !rounded-lg"
+          className="h-[38px]"
         >
           Cari
         </Button>
       </div>
 
-      {/* Right side: Actions */}
       <div className="flex items-center gap-3">
         <ExportButton
-          variant="secondary"
+          color="secondary"
           label="Unduh CSV"
           data={dataToExport}
           fileName={`kideco_amdal_${new Date().toISOString().slice(0, 10)}`}
         />
         <ExportButton
-          variant="primary"
+          color="primary"
           label="Unduh Excel"
           data={dataToExport}
           fileName={`kideco_amdal_${new Date().toISOString().slice(0, 10)}`}

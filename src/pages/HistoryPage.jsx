@@ -32,12 +32,6 @@ const HistoryPage = () => {
     setCurrentPage(0);
   }, [dateFrom, dateTo, acidityFilter]);
 
-  const [exportMsg, setExportMsg] = useState('');
-  const showExportMsg = (format) => {
-    setExportMsg(`Berhasil mengekspor data laporan format .${format.toUpperCase()}`);
-    setTimeout(() => setExportMsg(''), 4000);
-  };
-
   const filteredData = useMemo(() => {
     return historyData.filter((row) => {
       if (appliedFilters.acidity === 'ACIDIC' && row.status !== 'ASAM') return false;
@@ -62,72 +56,85 @@ const HistoryPage = () => {
   );
 
   return (
-    <div className="flex flex-col h-full bg-[var(--color-canvas)] overflow-hidden">
-      {/* ── Header ── */}
+    <div className="flex flex-col h-full bg-[#F5F5F5] overflow-hidden">
       <Header
-        title="Histori Data & Analisis AMDAL"
-        subtitle="Query, filter, dan ekspor data sensor untuk keperluan pelaporan lingkungan tambang"
-        icon={File02}
+        title="Histori & Laporan"
         systemStatus={systemStatus}
       />
 
-      {/* Scrollable Content with padding 8 (Negative Space Control) */}
-      <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6">
-        
-        {/* Filter Bar */}
-        <div className="bg-white border border-slate-100 rounded-2xl shadow-sm p-5">
-          <FilterToolbar
-            dateFrom={dateFrom}
-            dateTo={dateTo}
-            acidityFilter={acidityFilter}
-            onDateFromChange={setDateFrom}
-            onDateToChange={setDateTo}
-            onAcidityChange={setAcidityFilter}
-            onApplyFilter={handleApplyFilter}
-            dataToExport={filteredData}
-          />
-        </div>
+      <div className="flex-1 overflow-y-auto p-4 md:p-6">
+        <div className="bg-white rounded-[16px] border border-[#EAECF0] p-4 md:p-6 flex flex-col gap-[18px] min-h-full">
 
-        {/* Info Row */}
-        <div className="flex items-center justify-between px-1">
-          <span className="text-sm text-slate-500 font-medium">
-            Menampilkan <span className="font-bold text-slate-900">{filteredData.length}</span> entri
-            {appliedFilters.acidity !== 'ALL' && (
-              <Badge variant="primary" className="ml-2">
-                Filter: {appliedFilters.acidity}
-              </Badge>
-            )}
-          </span>
-        </div>
-
-        {/* Charts Row */}
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-12 lg:col-span-4">
-             <MaterialSedimentationChart />
-          </div>
-          <div className="col-span-12 lg:col-span-4">
-             <CircadianRangeChart />
-          </div>
-          <div className="col-span-12 lg:col-span-4">
-             <SweetSpotScatterChart />
-          </div>
-        </div>
-
-        {/* Table & Pagination Wrapper with max-h */}
-        <div className="flex flex-col bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden max-h-[600px]">
-          <div className="flex-1 overflow-auto">
-            <LogDataTable data={paginatedData} />
-          </div>
-          {filteredData.length > 0 && (
-            <div className="shrink-0 border-t border-slate-100">
-              <TablePaginationControl
-                totalLogs={filteredData.length}
-                itemsPerPage={ITEMS_PER_PAGE}
-                currentPage={currentPage}
-                onPageChange={setCurrentPage}
+          {/* Filter Bar */}
+          <div>
+            <div className="text-[11px] font-bold tracking-[0.07em] uppercase text-[#B9C8D7] mb-3">
+              Filter & Ekspor Data
+            </div>
+            <div className="bg-white rounded-[12px] border border-[#EAECF0] p-4">
+              <FilterToolbar
+                dateFrom={dateFrom}
+                dateTo={dateTo}
+                acidityFilter={acidityFilter}
+                onDateFromChange={setDateFrom}
+                onDateToChange={setDateTo}
+                onAcidityChange={setAcidityFilter}
+                onApplyFilter={handleApplyFilter}
+                dataToExport={filteredData}
               />
             </div>
-          )}
+          </div>
+
+          {/* Info Row */}
+          <div className="flex items-center justify-between">
+            <span className="text-[13px] text-[#8C9BAF] font-medium">
+              Menampilkan <span className="font-bold text-[#202020]">{filteredData.length}</span> entri
+              {appliedFilters.acidity !== 'ALL' && (
+                <Badge variant="primary" className="ml-2">
+                  Filter: {appliedFilters.acidity}
+                </Badge>
+              )}
+            </span>
+          </div>
+
+          {/* Charts Row */}
+          <div>
+            <div className="text-[11px] font-bold tracking-[0.07em] uppercase text-[#B9C8D7] mb-3">
+              Visualisasi Data
+            </div>
+            <div className="grid grid-cols-12 gap-[14px]">
+              <div className="col-span-12 lg:col-span-4">
+                <MaterialSedimentationChart />
+              </div>
+              <div className="col-span-12 lg:col-span-4">
+                <CircadianRangeChart />
+              </div>
+              <div className="col-span-12 lg:col-span-4">
+                <SweetSpotScatterChart />
+              </div>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div>
+            <div className="text-[11px] font-bold tracking-[0.07em] uppercase text-[#B9C8D7] mb-3">
+              Data Log Sensor
+            </div>
+            <div className="bg-white rounded-[12px] border border-[#EAECF0] overflow-hidden">
+              <div className="overflow-auto max-h-[500px]">
+                <LogDataTable data={paginatedData} />
+              </div>
+              {filteredData.length > 0 && (
+                <div className="shrink-0 border-t border-[#EAECF0]">
+                  <TablePaginationControl
+                    totalLogs={filteredData.length}
+                    itemsPerPage={ITEMS_PER_PAGE}
+                    currentPage={currentPage}
+                    onPageChange={setCurrentPage}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,14 +1,13 @@
-import React, { useState, useContext, useRef, useEffect } from 'react';
+import React, { useContext, useRef, useEffect } from 'react';
 import { SensorContext } from '../../context/SensorContext';
-import { VolumeMax, VolumeX, Loading01 } from '@untitledui/icons';
+import { VolumeX, VolumeMax } from '@untitledui/icons';
 
-const AudioToggleSwitch = () => {
-  const { audioToggleState, setAudioToggleState, systemStatus } = useContext(SensorContext);
-  const [isMutating, setIsMutating] = useState(false);
+const MuteAllButton = () => {
+  const { buzzerActive, setBuzzerActive, systemStatus } = useContext(SensorContext);
   const audioRef = useRef(null);
 
   useEffect(() => {
-    audioRef.current = new Audio('/assets/sounds/alarm kiamat.mp3');
+    audioRef.current = new Audio('/alarm.mp3');
     audioRef.current.loop = true;
     return () => {
       if (audioRef.current) {
@@ -20,54 +19,40 @@ const AudioToggleSwitch = () => {
 
   useEffect(() => {
     if (!audioRef.current) return;
-    if (audioToggleState && systemStatus === 'BAHAYA') {
+    if (buzzerActive && systemStatus === 'BAHAYA') {
       audioRef.current.play().catch(() => {});
     } else {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-  }, [audioToggleState, systemStatus]);
+  }, [buzzerActive, systemStatus]);
 
-  const handleToggle = () => {
-    if (isMutating) return;
-    setIsMutating(true);
-    setTimeout(() => {
-      setAudioToggleState((prev) => !prev);
-      setIsMutating(false);
-    }, 800);
-  };
-
-  const isOn = audioToggleState;
+  const isOn = buzzerActive;
 
   return (
     <button
-      onClick={handleToggle}
-      disabled={isMutating}
+      onClick={() => setBuzzerActive((prev) => !prev)}
       role="switch"
       aria-checked={isOn}
       className={`
-        w-full flex items-center justify-between px-3 py-2 rounded-[8px] transition-all duration-200 outline-none border
-        ${isMutating
-          ? 'opacity-70 cursor-wait border-[#EAECF0] bg-white'
-          : isOn
-          ? 'cursor-pointer border-[#16A34A]/30 bg-[#16A34A]/5'
-          : 'cursor-pointer border-[#EAECF0] bg-white'}
+        w-full flex items-center justify-between px-3 py-2 rounded-[8px] transition-all duration-200 outline-none border cursor-pointer
+        ${isOn
+          ? 'border-[#16A34A]/30 bg-[#16A34A]/5'
+          : 'border-[#EAECF0] bg-white'}
       `}
     >
       <div className="flex items-center gap-2.5">
         <div className={`w-[28px] h-[28px] rounded-[6px] flex items-center justify-center shrink-0 transition-colors duration-200 ${
           isOn ? 'bg-[#16A34A]/15' : 'bg-[#F7F8FA] border border-[#EAECF0]'
         }`}>
-          {isMutating ? (
-            <Loading01 size={14} strokeWidth={2} className="animate-spin text-[#B9C8D7]" />
-          ) : isOn ? (
+          {isOn ? (
             <VolumeMax size={14} strokeWidth={2} className="text-[#16A34A]" />
           ) : (
             <VolumeX size={14} strokeWidth={2} className="text-[#B9C8D7]" />
           )}
         </div>
         <div className="text-left">
-          <div className="text-[12px] font-semibold text-[#202020] leading-tight">Alarm pH</div>
+          <div className="text-[12px] font-semibold text-[#202020] leading-tight">Buzzer</div>
           <div className="text-[10px] text-[#B9C8D7] leading-tight mt-0.5">
             {isOn ? 'Aktif' : 'Mati'}
           </div>
@@ -91,4 +76,4 @@ const AudioToggleSwitch = () => {
   );
 };
 
-export default AudioToggleSwitch;
+export default MuteAllButton;
