@@ -42,11 +42,13 @@ const HistoryPage = () => {
       if (appliedFilters.acidity === 'NEUTRAL' && row.status !== 'AMAN') return false;
       if (appliedFilters.acidity === 'ALKALINE' && row.ph >= 4.5 && row.ph <= 9.0 && row.tds <= 800) return false;
 
+      const rowDt = row.timestamp.replace(' ', 'T').slice(0, 16);
+
       if (appliedFilters.dateFrom) {
-        if (row.timestamp.slice(0, 10) < appliedFilters.dateFrom) return false;
+        if (rowDt < appliedFilters.dateFrom) return false;
       }
       if (appliedFilters.dateTo) {
-        if (row.timestamp.slice(0, 10) > appliedFilters.dateTo) return false;
+        if (rowDt > appliedFilters.dateTo) return false;
       }
 
       return true;
