@@ -3,8 +3,8 @@ import { io as socketIO } from 'socket.io-client';
 
 export const SensorContext = createContext();
 
-const API_BASE_URL = 'http://localhost:3000/api';
-const SOCKET_URL = 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
 
 const generateInitialChartData = () => {
   const data = [];
