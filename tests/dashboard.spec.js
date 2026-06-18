@@ -151,16 +151,16 @@ test.describe('TC-03: Konfigurasi Batas Ambang (Threshold)', () => {
     await page.waitForTimeout(300);
     await page.click('text=Pengaturan');
 
-    // Pindah ke tab Threshold
-    await page.waitForSelector('text=Threshold', { timeout: 5000 });
-    await page.click('text=Threshold');
+    // Pindah ke tab Threshold — gunakan getByRole agar tidak kena intercept overlay
+    await page.waitForSelector('button:has-text("Threshold")', { timeout: 5000 });
+    await page.getByRole('button', { name: 'Threshold' }).click();
     await page.waitForSelector('text=Batas Minimum pH', { timeout: 5000 });
 
     // Ubah nilai
     const phMinInput = page.locator('input[type="number"]').first();
     await phMinInput.fill('4.5');
 
-    await page.click('text=Simpan Threshold');
+    await page.getByRole('button', { name: 'Simpan Threshold' }).click();
     await page.waitForTimeout(1500);
 
     // Sidebar tetap terlihat (tidak crash)
