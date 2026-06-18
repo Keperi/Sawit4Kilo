@@ -50,7 +50,7 @@ const GlobalDangerAlert = ({ activePage }) => {
   useEffect(() => {
     if (shouldPlayAudio) {
       if (!audioRef.current) {
-        audioRef.current = new Audio('/assets/sounds/alarm kiamat.mp3');
+        audioRef.current = new Audio('/assets/sounds/alarm_QenbR8T.mp3');
       }
       audioRef.current.play().catch((err) => {
         console.log('Audio autoplay blocked or failed', err);
