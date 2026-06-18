@@ -8,7 +8,7 @@ const AudioToggleSwitch = () => {
   const audioRef = useRef(null);
 
   useEffect(() => {
-    audioRef.current = new Audio('/assets/sounds/alarm kiamat.mp3');
+    audioRef.current = new Audio('/assets/sounds/alarm_QenbR8T.mp3');
     audioRef.current.loop = true;
     return () => {
       if (audioRef.current) {
