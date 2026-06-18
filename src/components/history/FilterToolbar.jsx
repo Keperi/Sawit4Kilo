@@ -28,22 +28,22 @@ const FilterToolbar = ({
 
         <input
           id="filter-date-from"
-          type="date"
+          type="datetime-local"
           value={dateFrom}
           onChange={(e) => onDateFromChange(e.target.value)}
-          className="h-[38px] px-3 bg-white border border-[#EAECF0] rounded-[8px] text-[13px] font-medium text-[#202020] outline-none transition-all focus:border-[#FF4628] max-w-[140px]"
-          title="Dari Tanggal"
+          className="h-[38px] px-3 bg-white border border-[#EAECF0] rounded-[8px] text-[13px] font-medium text-[#202020] outline-none transition-all focus:border-[#FF4628] max-w-[210px] w-full"
+          title="Dari Tanggal & Jam"
         />
 
         <span className="text-[#B9C8D7] text-[13px]">—</span>
 
         <input
           id="filter-date-to"
-          type="date"
+          type="datetime-local"
           value={dateTo}
           onChange={(e) => onDateToChange(e.target.value)}
-          className="h-[38px] px-3 bg-white border border-[#EAECF0] rounded-[8px] text-[13px] font-medium text-[#202020] outline-none transition-all focus:border-[#FF4628] max-w-[140px]"
-          title="Hingga Tanggal"
+          className="h-[38px] px-3 bg-white border border-[#EAECF0] rounded-[8px] text-[13px] font-medium text-[#202020] outline-none transition-all focus:border-[#FF4628] max-w-[210px] w-full"
+          title="Hingga Tanggal & Jam"
         />
 
         <div className="w-[130px]">
