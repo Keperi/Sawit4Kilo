@@ -23,6 +23,7 @@ Sistem dashboard berbasis **IoT + AI** untuk mendeteksi, memprediksi, dan member
 
 ## Daftar Isi
 
+- [Dokumentasi](#-dokumentasi-project)
 - [Latar Belakang](#-latar-belakang)
 - [Fitur Utama](#-fitur-utama)
 - [Arsitektur Sistem](#-arsitektur-sistem)
