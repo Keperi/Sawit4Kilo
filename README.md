@@ -1019,7 +1019,7 @@ Proyek ini mengikuti [Conventional Commits](https://www.conventionalcommits.org/
 | :---: | :---: |
 | <img src="https://github.com/user-attachments/assets/47373fa1-063a-4b6b-b80c-7e04c28cb9e9" alt="Halaman Dashboard" width="500"/> | <img src="https://github.com/user-attachments/assets/35f07f56-61e4-4c69-bc56-f3ab562d8624" alt="Halaman History" width="500"/> |
 | **Halaman Device** | **Halaman Analis** |
-| <img src="https://github.com/user-attachments/assets/d59e1c12-454f-426d-96b3-6a9e71a58c68" alt="Halaman Device" width="500"/> | <img src="https://github.com/user-attachments/assets/911f8d1d-c57f-4c36-bd4f-33c7fbe84e0c" alt="Halaman Analis" width="500"/> |
+| <img src="https://github.com/user-attachments/assets/29cdc14f-5169-4f3f-bf2b-c49a1116c934" alt="Halaman Device" width="500"/> | <img src="https://github.com/user-attachments/assets/911f8d1d-c57f-4c36-bd4f-33c7fbe84e0c" alt="Halaman Analis" width="500"/> |
 ---
 
 ## 📄 Lisensi
