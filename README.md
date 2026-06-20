@@ -38,6 +38,20 @@ Sistem dashboard berbasis **IoT + AI** untuk mendeteksi, memprediksi, dan member
 
 ---
 
+## Dokumentasi Project 📷
+<br>
+<br>**Halaman Dashboard**
+<img width="1644" height="1475" alt="image" src="https://github.com/user-attachments/assets/d2bbd5da-f5d7-498c-8aa4-00e58bfb784f" />
+<br>
+<br>**History & Laporan**
+<img width="1644" height="1197" alt="image" src="https://github.com/user-attachments/assets/813bcc66-7254-41c8-94f3-5a63181bdaa8" />
+<br>
+<br>**Device**
+<img width="1904" height="1034" alt="image" src="https://github.com/user-attachments/assets/d59e1c12-454f-426d-96b3-6a9e71a58c68" />
+<br>
+<br>**Analis**
+<img width="1644" height="3836" alt="image" src="https://github.com/user-attachments/assets/d196e9fa-52bb-4e9a-844b-fe9aada87719" />
+
 ## 🌊 Latar Belakang
 
 **Air Asam Tambang (AAT)** adalah limbah cair dari aktivitas penambangan batu bara. Saat pH air turun di bawah ambang aman atau kadar TDS melampaui batas, dampaknya sangat serius:
