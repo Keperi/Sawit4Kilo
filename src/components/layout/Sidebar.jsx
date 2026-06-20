@@ -1,4 +1,4 @@
-import React, { memo, Fragment } from 'react';
+import React, { memo, Fragment, useEffect } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import {
   BarChart01,
@@ -9,6 +9,7 @@ import {
   Settings02,
   ChevronDown,
   BarChart02,
+  X,
 } from '@untitledui/icons';
 import AudioToggleSwitch from '../dashboard/AudioToggleSwitch';
 
@@ -19,119 +20,157 @@ const navItems = [
   { id: 'analytics', label: 'Analisis', icon: BarChart02 },
 ];
 
-const Sidebar = memo(({ activePage, setActivePage, onOpenSettings }) => {
+const Sidebar = memo(({ activePage, setActivePage, onOpenSettings, isOpen = false, onClose }) => {
+
+  // Lock body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
+  const handleNavClick = (id) => {
+    setActivePage(id);
+    if (onClose) onClose();
+  };
+
   return (
-    <aside
-      id="sidebar-nav"
-      className="fixed left-0 top-0 w-[260px] h-screen flex flex-col z-30 bg-[#F5F5F5] border-r border-[#B9C8D7]/30"
-    >
-      <div className="flex flex-col h-full px-4 py-6">
+    <>
+      {/* ── Mobile Backdrop ── */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40 md:hidden transition-opacity duration-300"
+          onClick={onClose}
+        />
+      )}
 
-        {/* ── 1. Top: Logo ── */}
-        <div className="px-2 mb-6">
-          <div className="flex items-center gap-3">
-            <img src="/assets/logo/Logo Kideco.svg" alt="Kideco Logo" className="h-7 object-contain" />
-          </div>
-        </div>
+      <aside
+        id="sidebar-nav"
+        className={`
+          fixed left-0 top-0 w-[260px] h-screen flex flex-col z-50 bg-[#F5F5F5] border-r border-[#B9C8D7]/30
+          transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          md:translate-x-0 md:z-30
+        `}
+      >
+        <div className="flex flex-col h-full px-4 py-6">
 
-        {/* ── 2. Navigation ── */}
-        <div className="flex flex-col flex-1 px-2">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activePage === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => setActivePage(item.id)}
-                className={`
-                  w-full flex items-center gap-3.5 px-3 py-2.5 rounded-[10px] text-[13px] transition-all duration-200 mt-1
-                  ${isActive
-                    ? 'bg-white text-[#FF4628] font-bold border border-[#B9C8D7]/30 shadow-sm'
-                    : 'text-[#8C9BAF] font-normal hover:bg-[#B9C8D7]/10 border border-transparent'}
-                `}
-              >
-                <Icon
-                  size={18}
-                  strokeWidth={isActive ? 2 : 1.5}
-                  className={isActive ? 'text-[#FF4628]' : 'text-[#8C9BAF]'}
-                />
-                {item.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* ── 3. Audio Controls ── */}
-        <div className="border-t border-[#B9C8D7]/30 pt-4 px-2 mb-4">
-          <div className="px-3 mb-2">
-            <div className="text-[10px] font-bold tracking-[0.07em] uppercase text-[#B9C8D7]">Notifikasi</div>
-          </div>
-          <div className="px-3 flex flex-col gap-1.5">
-            <AudioToggleSwitch />
-          </div>
-        </div>
-
-        {/* ── 4. Bottom: Profile Dropdown ── */}
-        <div className="border-t border-[#B9C8D7]/30 pt-4 px-2">
-          <Menu as="div" className="relative">
-            <Menu.Button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] bg-white border border-[#B9C8D7]/30 shadow-sm transition-colors hover:bg-slate-50 cursor-pointer outline-none">
-              <img
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex"
-                alt="Alex Johnson"
-                className="w-[34px] h-[34px] rounded-full bg-[#B9C8D7]/20 shrink-0"
-              />
-              <div className="flex-1 min-w-0 text-left">
-                <div className="text-[11px] font-normal text-[#B9C8D7] truncate leading-tight">Admin</div>
-                <div className="text-[13px] font-bold text-[#202020] truncate leading-tight">
-                  Alex Johnson
-                </div>
-              </div>
-              <ChevronDown size={14} className="text-[#B9C8D7] shrink-0" />
-            </Menu.Button>
-            <Transition
-              as={Fragment}
-              enter="transition ease-out duration-100"
-              enterFrom="transform opacity-0 scale-95"
-              enterTo="transform opacity-100 scale-100"
-              leave="transition ease-in duration-75"
-              leaveFrom="transform opacity-100 scale-100"
-              leaveTo="transform opacity-0 scale-95"
+          {/* ── 1. Top: Logo + Mobile Close ── */}
+          <div className="px-2 mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <img src="/assets/logo/Logo Kideco.svg" alt="Kideco Logo" className="h-7 object-contain" />
+            </div>
+            <button
+              onClick={onClose}
+              className="md:hidden w-[28px] h-[28px] rounded-[8px] bg-white border border-[#B9C8D7]/30 flex items-center justify-center cursor-pointer hover:bg-slate-50 transition-colors"
+              aria-label="Tutup sidebar"
             >
-              <Menu.Items className="absolute left-full ml-2 bottom-0 w-[160px] rounded-[10px] bg-white border border-[#B9C8D7]/30 shadow-sm outline-none overflow-hidden z-50">
-                <div className="p-1">
-                  <Menu.Item>
-                    {({ active }) => (
-                      <button
-                        onClick={() => onOpenSettings()}
-                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-[8px] text-[13px] font-bold transition-colors duration-150 ${
-                          active ? 'bg-[#F5F5F5] text-[#202020]' : 'text-[#202020]'
-                        }`}
-                      >
-                        <Settings01 size={16} strokeWidth={2} />
-                        Pengaturan
-                      </button>
-                    )}
-                  </Menu.Item>
-                  <Menu.Item>
-                    {({ active }) => (
-                      <button
-                        className={`w-full flex items-center gap-3 px-3 py-2 rounded-[8px] text-[13px] font-bold transition-colors duration-150 ${
-                          active ? 'bg-[#FF4628]/10 text-[#FF4628]' : 'text-[#FF4628]'
-                        }`}
-                      >
-                        <LogOut01 size={16} strokeWidth={2} />
-                        Logout
-                      </button>
-                    )}
-                  </Menu.Item>
-                </div>
-              </Menu.Items>
-            </Transition>
-          </Menu>
-        </div>
+              <X size={14} strokeWidth={2} className="text-[#8C9BAF]" />
+            </button>
+          </div>
 
-      </div>
-    </aside>
+          {/* ── 2. Navigation ── */}
+          <div className="flex flex-col flex-1 px-2">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activePage === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleNavClick(item.id)}
+                  className={`
+                    w-full flex items-center gap-3.5 px-3 py-2.5 rounded-[10px] text-[13px] transition-all duration-200 mt-1
+                    ${isActive
+                      ? 'bg-white text-[#FF4628] font-bold border border-[#B9C8D7]/30 shadow-sm'
+                      : 'text-[#8C9BAF] font-normal hover:bg-[#B9C8D7]/10 border border-transparent'}
+                  `}
+                >
+                  <Icon
+                    size={18}
+                    strokeWidth={isActive ? 2 : 1.5}
+                    className={isActive ? 'text-[#FF4628]' : 'text-[#8C9BAF]'}
+                  />
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* ── 3. Audio Controls ── */}
+          <div className="border-t border-[#B9C8D7]/30 pt-4 px-2 mb-4">
+            <div className="px-3 mb-2">
+              <div className="text-[10px] font-bold tracking-[0.07em] uppercase text-[#B9C8D7]">Notifikasi</div>
+            </div>
+            <div className="px-3 flex flex-col gap-1.5">
+              <AudioToggleSwitch />
+            </div>
+          </div>
+
+          {/* ── 4. Bottom: Profile Dropdown ── */}
+          <div className="border-t border-[#B9C8D7]/30 pt-4 px-2">
+            <Menu as="div" className="relative">
+              <Menu.Button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] bg-white border border-[#B9C8D7]/30 shadow-sm transition-colors hover:bg-slate-50 cursor-pointer outline-none">
+                <img
+                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=Alex"
+                  alt="Alex Johnson"
+                  className="w-[34px] h-[34px] rounded-full bg-[#B9C8D7]/20 shrink-0"
+                />
+                <div className="flex-1 min-w-0 text-left">
+                  <div className="text-[11px] font-normal text-[#B9C8D7] truncate leading-tight">Admin</div>
+                  <div className="text-[13px] font-bold text-[#202020] truncate leading-tight">
+                    Alex Johnson
+                  </div>
+                </div>
+                <ChevronDown size={14} className="text-[#B9C8D7] shrink-0" />
+              </Menu.Button>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+              >
+                <Menu.Items className="absolute left-full ml-2 bottom-0 w-[160px] rounded-[10px] bg-white border border-[#B9C8D7]/30 shadow-sm outline-none overflow-hidden z-50">
+                  <div className="p-1">
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          onClick={() => onOpenSettings()}
+                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-[8px] text-[13px] font-bold transition-colors duration-150 ${
+                            active ? 'bg-[#F5F5F5] text-[#202020]' : 'text-[#202020]'
+                          }`}
+                        >
+                          <Settings01 size={16} strokeWidth={2} />
+                          Pengaturan
+                        </button>
+                      )}
+                    </Menu.Item>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-[8px] text-[13px] font-bold transition-colors duration-150 ${
+                            active ? 'bg-[#FF4628]/10 text-[#FF4628]' : 'text-[#FF4628]'
+                          }`}
+                        >
+                          <LogOut01 size={16} strokeWidth={2} />
+                          Logout
+                        </button>
+                      )}
+                    </Menu.Item>
+                  </div>
+                </Menu.Items>
+              </Transition>
+            </Menu>
+          </div>
+
+        </div>
+      </aside>
+    </>
   );
 });
 

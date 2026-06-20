@@ -12,23 +12,27 @@ import GlobalDangerAlert from './components/layout/GlobalDangerAlert';
 function App() {
   const [activePage, setActivePage] = useState('dashboard');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const openSidebar = () => setIsSidebarOpen(true);
+  const closeSidebar = () => setIsSidebarOpen(false);
 
   const renderPage = () => {
     switch (activePage) {
       case 'dashboard':
-        return <DashboardPage setActivePage={setActivePage} />;
+        return <DashboardPage setActivePage={setActivePage} onOpenSidebar={openSidebar} />;
       case 'reports':
-        return <HistoryPage />;
+        return <HistoryPage onOpenSidebar={openSidebar} />;
       case 'config':
-        return <ConfigPage />;
+        return <ConfigPage onOpenSidebar={openSidebar} />;
       case 'settings':
-        return <Settings />;
+        return <Settings onOpenSidebar={openSidebar} />;
       case 'device':
-        return <DevicePage setActivePage={setActivePage} />;
+        return <DevicePage setActivePage={setActivePage} onOpenSidebar={openSidebar} />;
       case 'analytics':
-        return <AnalyticsPage />;
+        return <AnalyticsPage onOpenSidebar={openSidebar} />;
       default:
-        return <DashboardPage setActivePage={setActivePage} />;
+        return <DashboardPage setActivePage={setActivePage} onOpenSidebar={openSidebar} />;
     }
   };
 
@@ -38,6 +42,8 @@ function App() {
         activePage={activePage}
         setActivePage={setActivePage}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        isOpen={isSidebarOpen}
+        onClose={closeSidebar}
       />
 
       <main className="md:ml-[260px] flex-1 flex flex-col h-screen overflow-hidden">

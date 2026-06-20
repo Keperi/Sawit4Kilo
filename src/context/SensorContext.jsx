@@ -3,8 +3,8 @@ import { io as socketIO } from 'socket.io-client';
 
 export const SensorContext = createContext();
 
-const API_BASE_URL = 'http://localhost:3000/api';
-const SOCKET_URL = 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000';
 
 const generateInitialChartData = () => {
   const data = [];
@@ -77,6 +77,15 @@ export const SensorProvider = ({ children }) => {
     role: 'Environment Engineer',
     sessionActive: true
   });
+
+  const [dashboardMode, setDashboardMode] = useState(() => {
+    return localStorage.getItem('KIDECO_DASHBOARD_MODE') || 'realtime';
+  });
+
+  const changeDashboardMode = useCallback((mode) => {
+    setDashboardMode(mode);
+    localStorage.setItem('KIDECO_DASHBOARD_MODE', mode);
+  }, []);
   
   const [activeSensor, setActiveSensor] = useState('ALL');
   const [audioToggleState, setAudioToggleState] = useState(() => {
@@ -190,9 +199,12 @@ export const SensorProvider = ({ children }) => {
   const [currentTds, setCurrentTds] = useState(400);
   const [lastTimestamp, setLastTimestamp] = useState(formatTime(new Date()));
 
+  const activeNodeObj = nodes.find(n => n.id === selectedNode);
+  const isNodeOffline = activeNodeObj ? !activeNodeObj.online : false;
+
   const isPhAlert = currentPh < phThresholdMin || currentPh > phThresholdMax;
   const isTdsAlert = currentTds > tdsThreshold;
-  const systemStatus = (isPhAlert || isTdsAlert) ? 'BAHAYA' : 'AMAN';
+  const systemStatus = isNodeOffline ? 'OFFLINE' : (isPhAlert || isTdsAlert) ? 'BAHAYA' : 'AMAN';
 
   useEffect(() => {
     if (systemStatus === 'BAHAYA') {
@@ -214,12 +226,18 @@ export const SensorProvider = ({ children }) => {
         else if (isPhDanger) msg = `pH Kritis terdeteksi: ${currentPh}.`;
         else msg = `TDS Kritis terdeteksi: ${currentTds} ppm.`;
         addNotification('DANGER', msg);
-      } else {
-        addNotification('SUCCESS', 'Kondisi air kembali normal dan Aman.');
+      } else if (systemStatus === 'OFFLINE') {
+        addNotification('OFFLINE', `Node ${selectedNode} terputus (Offline)`);
+      } else if (systemStatus === 'AMAN') {
+        if (prevStatusRef.current === 'BAHAYA') {
+          addNotification('SUCCESS', 'Kondisi air kembali normal dan Aman.');
+        } else if (prevStatusRef.current === 'OFFLINE') {
+          addNotification('SUCCESS', `Node ${selectedNode} kembali terhubung (Online)`);
+        }
       }
       prevStatusRef.current = systemStatus;
     }
-  }, [systemStatus, currentPh, currentTds, phThresholdMin, phThresholdMax, tdsThreshold, addNotification]);
+  }, [systemStatus, currentPh, currentTds, phThresholdMin, phThresholdMax, tdsThreshold, addNotification, selectedNode]);
 
   // Track nodes online/offline status changes for real-time notifications
   const prevNodesOnlineRef = useRef({
@@ -240,6 +258,32 @@ export const SensorProvider = ({ children }) => {
     });
   }, [nodes, addNotification]);
 
+  // Real-time offline detection: check every 3 seconds if any node has not sent data in the last 15 seconds
+  useEffect(() => {
+    if (dashboardMode === 'sandbox') return; // Skip offline detection in sandbox mode
+
+    const offlineChecker = setInterval(() => {
+      const now = Date.now();
+      setNodes((prevNodes) => {
+        let changed = false;
+        const nextNodes = prevNodes.map((node) => {
+          const lastUpdateTime = new Date(node.lastUpdate).getTime();
+          if (node.online && (now - lastUpdateTime > 15000)) {
+            changed = true;
+            return {
+              ...node,
+              online: false,
+            };
+          }
+          return node;
+        });
+        return changed ? nextNodes : prevNodes;
+      });
+    }, 3000);
+
+    return () => clearInterval(offlineChecker);
+  }, [dashboardMode]);
+
   const audioContextRef = useRef(null);
 
   // Fetch initial history data from backend
@@ -248,6 +292,24 @@ export const SensorProvider = ({ children }) => {
       const response = await fetch(`${API_BASE_URL}/sensor-data?limit=100`);
       const result = await response.json();
       if (result.success && result.data && result.data.length > 0) {
+        const latestItem = result.data[0];
+        if (latestItem) {
+          const itemDate = parseESP32Timestamp(latestItem.timestamp, latestItem.createdAt);
+          const isOfflineOnLoad = (Date.now() - itemDate.getTime()) > 15000;
+          setNodes(prev => prev.map(node => {
+            if (node.id === selectedNode) {
+              return {
+                ...node,
+                online: !isOfflineOnLoad,
+                ph: latestItem.ph,
+                tds: latestItem.tds,
+                lastUpdate: itemDate,
+              };
+            }
+            return node;
+          }));
+        }
+
         // Map backend data format to frontend row format
         const mappedHistory = result.data.map((item, index) => {
           const itemDate = parseESP32Timestamp(item.timestamp, item.createdAt);
@@ -467,6 +529,8 @@ export const SensorProvider = ({ children }) => {
 
   // Setup Koneksi Socket.io dan simulator
   useEffect(() => {
+    if (dashboardMode === 'sandbox') return; // Skip connection in sandbox mode
+
     fetchHistory(); // Ambil riwayat di awal
 
     const socket = socketIO(SOCKET_URL);
@@ -560,34 +624,95 @@ export const SensorProvider = ({ children }) => {
       clearInterval(fallbackInterval);
       clearInterval(simulatorInterval);
     };
-  }, [fetchHistory, handleNewSensorData, selectedNode, lastTimestamp]);
+  }, [fetchHistory, handleNewSensorData, selectedNode, lastTimestamp, dashboardMode]);
 
-  // Play alarm beep ketika bahaya terdeteksi
+  // Sandbox Simulator Effect
   useEffect(() => {
-    const quiet = isInQuietHours(notificationSettings);
-    const soundOn = notificationSettings ? notificationSettings.soundEnabled : true;
+    if (dashboardMode !== 'sandbox') return;
 
-    const shouldBeep = audioToggleState && systemStatus === 'BAHAYA';
+    const interval = setInterval(() => {
+      const now = new Date();
+      const timeStr = formatTime(now);
 
-    if (shouldBeep && soundOn && !quiet) {
-      try {
-        if (!audioContextRef.current) {
-          audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        const ctx = audioContextRef.current;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = 880;
-        osc.type = 'square';
-        gain.gain.value = 0.05;
-        osc.start();
-        osc.stop(ctx.currentTime + 0.1);
-      } catch {
-        // Audio API not supported
-      }
-    }
+      // Generate next values for selectedNode
+      let nextPh = currentPh;
+      setCurrentPh((prev) => {
+        const change = Math.random() * 0.4 - 0.2;
+        let next = parseFloat((prev + change).toFixed(1));
+        if (next < 3.0) next = 3.0;
+        if (next > 10.0) next = 10.0;
+        nextPh = next;
+        return next;
+      });
+
+      let nextTds = currentTds;
+      setCurrentTds((prev) => {
+        const change = Math.floor(Math.random() * 40 - 20);
+        let next = prev + change;
+        if (next < 150) next = 150;
+        if (next > 1300) next = 1300;
+        nextTds = next;
+        return next;
+      });
+
+      setLastTimestamp(timeStr);
+
+      setChartData((prev) => {
+        const newPoint = { time: timeStr, ph: nextPh, tds: nextTds };
+        const updated = [...prev, newPoint];
+        return updated.length > 60 ? updated.slice(-60) : updated;
+      });
+
+      setNodes((prev) =>
+        prev.map((node) => {
+          if (node.id === selectedNode) {
+            const miniTime = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const newPoint = { time: miniTime, ph: nextPh, tds: nextTds };
+            const updatedChart = [...node.chartData, newPoint];
+            const trimmedChart = updatedChart.length > 30 ? updatedChart.slice(-30) : updatedChart;
+            return {
+              ...node,
+              online: true,
+              ph: nextPh,
+              tds: nextTds,
+              lastUpdate: now,
+              chartData: trimmedChart,
+            };
+          } else {
+            const phChange = Math.random() * 0.2 - 0.1;
+            let nPh = parseFloat((node.ph + phChange).toFixed(1));
+            if (nPh < 4.0) nPh = 4.0;
+            if (nPh > 9.0) nPh = 9.0;
+
+            const tdsChange = Math.floor(Math.random() * 20 - 10);
+            let nTds = node.tds + tdsChange;
+            if (nTds < 100) nTds = 100;
+            if (nTds > 800) nTds = 800;
+
+            const miniTime = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const newPoint = { time: miniTime, ph: nPh, tds: nTds };
+            const updatedChart = [...node.chartData, newPoint];
+            const trimmedChart = updatedChart.length > 30 ? updatedChart.slice(-30) : updatedChart;
+
+            return {
+              ...node,
+              online: true,
+              ph: nPh,
+              tds: nTds,
+              lastUpdate: now,
+              chartData: trimmedChart,
+            };
+          }
+        })
+      );
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [dashboardMode, selectedNode, currentPh, currentTds]);
+
+  // Play alarm beep ketika bahaya terdeteksi (Dinonaktifkan sesuai permintaan: suara tit tit tit tidak diperlukan)
+  useEffect(() => {
+    // beep dinonaktifkan
   }, [audioToggleState, systemStatus, notificationSettings]);
 
   const updateThresholds = useCallback(({ phMin, phMax, tdsMax }) => {
@@ -656,6 +781,9 @@ export const SensorProvider = ({ children }) => {
         notifications,
         setNotifications,
         addNotification,
+
+        dashboardMode,
+        changeDashboardMode,
       }}
     >
       {children}

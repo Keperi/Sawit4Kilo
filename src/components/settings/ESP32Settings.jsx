@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { AlertTriangle, CheckCircle, AlertCircle } from '@untitledui/icons';
+import { SensorContext } from '../../context/SensorContext';
 
 const DEVICE_ID = 'gateway-01';
 
@@ -33,6 +34,7 @@ const saveConfig = async (data) => {
 };
 
 const ESP32Settings = () => {
+  const { dashboardMode, changeDashboardMode } = useContext(SensorContext);
   const [apiUrl, setApiUrl] = useState('');
   const [sendInterval, setSendInterval] = useState(6000);
   const [isActive, setIsActive] = useState(true);
@@ -117,6 +119,38 @@ const ESP32Settings = () => {
       )}
 
       <div className="flex flex-col gap-5">
+        {/* Mode Dashboard */}
+        <div>
+          <label className="block text-[13px] font-bold text-[#202020] mb-2">Mode Dashboard</label>
+          <div className="flex bg-[#F2F4F7] p-1 rounded-[10px] w-full">
+            <button
+              onClick={() => changeDashboardMode('realtime')}
+              className={`flex-1 py-2 text-center text-[12px] font-bold rounded-[8px] transition-all cursor-pointer outline-none ${
+                dashboardMode === 'realtime'
+                  ? 'bg-white text-[#FF4628] shadow-sm'
+                  : 'text-[#667085] hover:text-[#202020]'
+              }`}
+            >
+              Mode Realtime
+            </button>
+            <button
+              onClick={() => changeDashboardMode('sandbox')}
+              className={`flex-1 py-2 text-center text-[12px] font-bold rounded-[8px] transition-all cursor-pointer outline-none ${
+                dashboardMode === 'sandbox'
+                  ? 'bg-white text-amber-600 shadow-sm'
+                  : 'text-[#667085] hover:text-[#202020]'
+              }`}
+            >
+              Mode Sandbox (Simulasi)
+            </button>
+          </div>
+          <p className="text-[11px] text-[#B9C8D7] mt-1.5">
+            {dashboardMode === 'realtime'
+              ? 'Menerima data secara langsung dari perangkat gateway hardware ESP32.'
+              : 'Menjalankan simulasi data lokal tanpa membutuhkan koneksi hardware ESP32.'}
+          </p>
+        </div>
+
         {/* Device ID */}
         <div>
           <label className="block text-[13px] font-bold text-[#202020] mb-1.5">Device ID</label>

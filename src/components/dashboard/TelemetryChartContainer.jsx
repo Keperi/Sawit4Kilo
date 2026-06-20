@@ -148,10 +148,10 @@ const TelemetryChartContainer = () => {
   const rightDomain = ['dataMin - 50', 'dataMax + 50'];
 
   return (
-    <div className="w-full bg-white rounded-[12px] border border-[#EAECF0] p-5 flex flex-col" style={{ height: '340px' }}>
+    <div className="w-full bg-white rounded-[12px] border border-[#EAECF0] p-4 sm:p-5 flex flex-col min-h-[260px] sm:min-h-[340px]">
 
       {/* ── Header ── */}
-      <div className="flex items-start justify-between mb-5 shrink-0 flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 sm:mb-5 shrink-0 gap-3">
         <div>
           <p className="text-[14px] font-bold text-[#101828] leading-none">
             Grafik Tren Real-time
@@ -170,7 +170,7 @@ const TelemetryChartContainer = () => {
       </div>
 
       {/* ── Legend dots ── */}
-      <div className="flex items-center gap-4 mb-3 shrink-0">
+      <div className="flex items-center gap-3 sm:gap-4 mb-3 shrink-0 flex-wrap">
         {showPh && (
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#FF4628] inline-block" />

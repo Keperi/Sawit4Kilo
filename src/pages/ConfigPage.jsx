@@ -5,7 +5,7 @@ import DeviceHeartbeat from '../components/config/DeviceHeartbeat';
 import ThresholdConfigurationForm from '../components/config/ThresholdConfigurationForm';
 import { Settings01 } from '@untitledui/icons';
 
-const ConfigPage = () => {
+const ConfigPage = ({ onOpenSidebar }) => {
   const { phThresholdMin, phThresholdMax, updateThresholds, systemStatus } = useContext(SensorContext);
 
   return (
@@ -16,6 +16,7 @@ const ConfigPage = () => {
         subtitle="Pantau status koneksi hardware LoRa/ESP32 dan atur batas ambang alarm AMDAL"
         icon={Settings01}
         systemStatus={systemStatus}
+        onOpenSidebar={onOpenSidebar}
       />
 
       {/* Scrollable Content */}

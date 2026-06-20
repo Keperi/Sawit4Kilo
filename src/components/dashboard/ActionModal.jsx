@@ -45,15 +45,15 @@ const ActionModal = ({ isOpen, onClose, sensorData }) => {
   const scale = isClosing ? 'scale-95' : 'scale-100';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
       <div
         className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-200 ${opacity}`}
         onClick={handleClose}
       />
 
-      <div className={`relative w-full max-w-[700px] max-h-[85vh] bg-white rounded-[16px] border border-[#EAECF0] shadow-xl flex flex-col overflow-hidden transition-all duration-200 ${opacity} ${scale}`}>
+      <div className={`relative w-full max-w-[700px] max-h-[90vh] sm:max-h-[85vh] bg-white rounded-[16px] border border-[#EAECF0] shadow-xl flex flex-col overflow-hidden transition-all duration-200 ${opacity} ${scale}`}>
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#EAECF0] shrink-0">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-[#EAECF0] shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-[40px] h-[40px] rounded-[10px] bg-[#FF4628]/10 flex items-center justify-center">
               <AlertTriangle size={20} strokeWidth={2} className="text-[#FF4628]" />
@@ -72,7 +72,7 @@ const ActionModal = ({ isOpen, onClose, sensorData }) => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20">
               <Loading01 size={32} className="animate-spin text-[#FF4628] mb-4" />
@@ -94,7 +94,7 @@ const ActionModal = ({ isOpen, onClose, sensorData }) => {
               {actionPlan.data_detail?.length > 0 && (
                 <div>
                   <h3 className="text-[13px] font-bold text-[#202020] mb-3">Data Sensor Detail</h3>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {actionPlan.data_detail.map((item, i) => (
                       <div key={i} className="bg-[#F7F8FA] border border-[#EAECF0] rounded-[10px] p-4">
                         <div className="text-[11px] font-bold uppercase tracking-wider text-[#B9C8D7] mb-2">{item.parameter}</div>
@@ -156,7 +156,7 @@ const ActionModal = ({ isOpen, onClose, sensorData }) => {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-[#EAECF0] shrink-0">
+        <div className="px-4 sm:px-6 py-4 border-t border-[#EAECF0] shrink-0">
           <button
             onClick={handleClose}
             className="w-full h-[42px] rounded-[10px] bg-[#FF4628] text-white text-[13px] font-bold cursor-pointer hover:bg-[#e03d22] transition-colors"
