@@ -21,7 +21,8 @@ Sistem dashboard berbasis **IoT + AI** untuk mendeteksi, memprediksi, dan member
 
 ---
 
-## Daftar Isi
+## 📑 Daftar Isi
+
 - [Live Preview Project](#-live-preview-project)
 - [Latar Belakang](#-latar-belakang)
 - [Fitur Utama](#-fitur-utama)
@@ -31,10 +32,12 @@ Sistem dashboard berbasis **IoT + AI** untuk mendeteksi, memprediksi, dan member
 - [Instalasi](#-instalasi)
 - [Konfigurasi Environment](#-konfigurasi-environment)
 - [Struktur Direktori](#-struktur-direktori)
+- [Diagram Arsitektur](#-diagram-arsitektur)
 - [Dokumentasi API](#-dokumentasi-api)
 - [Pengujian](#-pengujian)
 - [NPM Scripts](#-npm-scripts)
 - [Kontribusi](#-kontribusi)
+- [Dokumentasi Project](#-dokumentasi-project)
 
 ---
 
@@ -53,16 +56,16 @@ Sistem dashboard berbasis **IoT + AI** untuk mendeteksi, memprediksi, dan member
 **Air Asam Tambang (AAT)** adalah limbah cair dari aktivitas penambangan batu bara. Saat pH air turun di bawah ambang aman atau kadar TDS melampaui batas, dampaknya sangat serius:
 
 | Dampak | Keterangan |
-|--------|-----------|
-| 🏭 Pencemaran lingkungan | Mencemari sungai dan tanah di sekitar area tambang |
-| 🐟 Kerusakan ekosistem | Mengancam kehidupan biota air dan rantai ekosistem perairan |
-| 🏘️ Ancaman kesehatan | Membahayakan masyarakat yang bergantung pada air tanah |
+| :--- | :--- |
+| 🏭 **Pencemaran lingkungan** | Mencemari sungai dan tanah di sekitar area tambang |
+| 🐟 **Kerusakan ekosistem** | Mengancam kehidupan biota air dan rantai ekosistem perairan |
+| 🏘️ **Ancaman kesehatan** | Membahayakan masyarakat yang bergantung pada air tanah |
 
 **SIMPATI-AAT** hadir sebagai solusi yang menggabungkan sensor **IoT (ESP32/LoRa)** dengan kecerdasan buatan **Groq AI** untuk:
 
-1. **Deteksi dini** — Monitoring pH dan TDS secara real-time dari multiple titik sensor
-2. **Prediksi** — Analisis tren dan anomali sebelum masalah terjadi
-3. **Mitigasi** — Action plan yang dihasilkan AI untuk penanganan cepat dan tepat
+1. **Deteksi dini** — Monitoring pH dan TDS secara real-time dari multiple titik sensor.
+2. **Prediksi** — Analisis tren dan anomali sebelum masalah terjadi.
+3. **Mitigasi** — Action plan yang dihasilkan AI untuk penanganan cepat dan tepat.
 
 ---
 
@@ -71,57 +74,47 @@ Sistem dashboard berbasis **IoT + AI** untuk mendeteksi, memprediksi, dan member
 <details>
 <summary><strong>📡 Monitoring Real-Time</strong></summary>
 
-<br/>
-
-- Dashboard live yang menampilkan data **pH dan TDS** dari setiap node sensor (ESP32/LoRa)
-- Grafik telemetry yang terupdate otomatis via **Socket.IO**
-- Status sistem otomatis: **`AMAN`** atau **`BAHAYA`** berdasarkan ambang batas yang dapat dikonfigurasi
+- Dashboard live yang menampilkan data **pH dan TDS** dari setiap node sensor (ESP32/LoRa).
+- Grafik telemetry yang terupdate otomatis via **Socket.IO**.
+- Status sistem otomatis: **`AMAN`** atau **`BAHAYA`** berdasarkan ambang batas yang dapat dikonfigurasi.
 
 </details>
 
 <details>
 <summary><strong>🤖 Analisis & Prediksi Berbasis AI</strong></summary>
 
-<br/>
-
-- **AI Insight** — Ringkasan kondisi air 1-2 kalimat oleh model Llama 3.1 (cepat)
-- **AI Action Plan** — Rencana mitigasi lengkap dalam format JSON oleh model Llama 3.3 (penalaran tinggi)
-- Modul analitik: tren, statistik, deteksi anomali, korelasi, dan peramalan (forecast)
+- **AI Insight** — Ringkasan kondisi air 1-2 kalimat oleh model Llama 3.1 (cepat).
+- **AI Action Plan** — Rencana mitigasi lengkap dalam format JSON oleh model Llama 3.3 (penalaran tinggi).
+- Modul analitik: tren, statistik, deteksi anomali, korelasi, dan peramalan (forecast).
 
 </details>
 
 <details>
 <summary><strong>🔌 Manajemen Multi-Node</strong></summary>
 
-<br/>
-
-- Dukungan beberapa node sensor (KDC01, KDC02, dst.) dengan lokasi berbeda
-- Panel device untuk memantau status koneksi setiap node
-- Detail sidebar per node dengan grafik mini dan riwayat data
+- Dukungan beberapa node sensor (KDC01, KDC02, dst.) dengan lokasi berbeda.
+- Panel device untuk memantau status koneksi setiap node.
+- Detail sidebar per node dengan grafik mini dan riwayat data.
 
 </details>
 
 <details>
 <summary><strong>🔔 Notifikasi & Alert</strong></summary>
 
-<br/>
-
-- Banner peringatan visual saat kondisi BAHAYA terdeteksi
-- Alarm audio (buzzer) yang dapat diaktifkan/dinonaktifkan
-- Log notifikasi real-time (danger, offline, success)
-- Pengaturan **quiet hours** untuk menonaktifkan notifikasi pada jam tertentu
+- Banner peringatan visual saat kondisi BAHAYA terdeteksi.
+- Alarm audio (buzzer) yang dapat diaktifkan/dinonaktifkan.
+- Log notifikasi real-time (danger, offline, success).
+- Pengaturan **quiet hours** untuk menonaktifkan notifikasi pada jam tertentu.
 
 </details>
 
 <details>
 <summary><strong>⚙️ Konfigurasi & Riwayat Data</strong></summary>
 
-<br/>
-
-- Pengaturan ambang batas pH (min/max) dan TDS (maks) melalui UI
-- Semua konfigurasi tersimpan di localStorage browser
-- Tabel log data sensor dengan filter (tanggal, status, node) dan pagination
-- Ekspor data ke Excel dan visualisasi: grafik sedimentasi, circadian range, scatter plot
+- Pengaturan ambang batas pH (min/max) dan TDS (maks) melalui UI.
+- Semua konfigurasi tersimpan di localStorage browser.
+- Tabel log data sensor dengan filter (tanggal, status, node) dan pagination.
+- Ekspor data ke Excel dan visualisasi: grafik sedimentasi, circadian range, scatter plot.
 
 </details>
 
@@ -131,7 +124,7 @@ Sistem dashboard berbasis **IoT + AI** untuk mendeteksi, memprediksi, dan member
 
 Arsitektur SIMPATI-AAT menggunakan pola **decoupled** — frontend dan backend terpisah, berkomunikasi via Socket.IO dan REST API.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                        USER / BROWSER                       │
 │                                                             │
@@ -164,7 +157,7 @@ Arsitektur SIMPATI-AAT menggunakan pola **decoupled** — frontend dan backend t
 ### Komponen Utama
 
 | Komponen | Teknologi | Port | Fungsi |
-|----------|-----------|:----:|--------|
+| :--- | :--- | :---: | :--- |
 | **Frontend** | React 18 + Vite | `5173` | UI dashboard, visualisasi data |
 | **Backend** | Express.js + Groq SDK | `3001` | Proxy AI, validasi request |
 | **External API** | Socket.IO + REST | `3000` | Data sensor dari ESP32/LoRa |
@@ -175,7 +168,7 @@ Arsitektur SIMPATI-AAT menggunakan pola **decoupled** — frontend dan backend t
 Dua model dipilih berdasarkan kompleksitas tugas:
 
 | Aspek | Insight (Fast) | Action Plan (Reasoning) |
-|-------|:-------------:|:-----------------------:|
+| :--- | :---: | :---: |
 | **Model** | `llama-3.1-8b-instant` | `llama-3.3-70b-versatile` |
 | **Kecepatan** | ⚡ Sangat cepat | 🧠 Analisis mendalam |
 | **Max Token** | 200 | 1500 |
@@ -186,14 +179,8 @@ Dua model dipilih berdasarkan kompleksitas tugas:
 <details>
 <summary><strong>Contoh Output AI</strong></summary>
 
-<br/>
-
 **Insight (Fast):**
-```
-Kondisi air di Node KDC01 menunjukkan pH 3.2 (asam) yang jauh di bawah ambang aman
-4.5–9.0. TDS 1200 ppm melampaui batas maksimal 800 ppm, indikasi kontaminasi logam
-berat yang memerlukan penanganan segera.
-```
+> Kondisi air di Node KDC01 menunjukkan pH 3.2 (asam) yang jauh di bawah ambang aman 4.5–9.0. TDS 1200 ppm melampaui batas maksimal 800 ppm, indikasi kontaminasi logam berat yang memerlukan penanganan segera.
 
 **Action Plan (Reasoning):**
 ```json
@@ -222,46 +209,40 @@ berat yang memerlukan penanganan segera.
 <details>
 <summary><strong>Frontend</strong></summary>
 
-<br/>
-
 | Teknologi | Versi | Fungsi |
-|-----------|:-----:|--------|
-| React | 18.2 | UI library utama |
-| Vite | 5.0 | Build tool & dev server |
-| Tailwind CSS | 4.3 | Utility-first CSS framework |
-| Recharts | 2.10 | Visualisasi grafik |
-| MUI (Material UI) | 9.1 | Komponen UI (charts) |
-| Socket.IO Client | 4.8 | Koneksi real-time ke server sensor |
-| React Hook Form | 7.78 | Manajemen form |
-| Zod | 4.4 | Validasi schema |
-| Lucide React | 1.17 | Ikon |
-| xlsx | 0.18 | Ekspor data ke Excel |
+| :--- | :---: | :--- |
+| **React** | 18.2 | UI library utama |
+| **Vite** | 5.0 | Build tool & dev server |
+| **Tailwind CSS** | 4.3 | Utility-first CSS framework |
+| **Recharts** | 2.10 | Visualisasi grafik |
+| **MUI (Material UI)** | 9.1 | Komponen UI (charts) |
+| **Socket.IO Client** | 4.8 | Koneksi real-time ke server sensor |
+| **React Hook Form** | 7.78 | Manajemen form |
+| **Zod** | 4.4 | Validasi schema |
+| **Lucide React** | 1.17 | Ikon |
+| **xlsx** | 0.18 | Ekspor data ke Excel |
 
 </details>
 
 <details>
 <summary><strong>Backend</strong></summary>
 
-<br/>
-
 | Teknologi | Versi | Fungsi |
-|-----------|:-----:|--------|
-| Express.js | 4.19 | HTTP server |
-| Groq SDK | 0.9 | Client untuk Groq AI API |
-| Socket.IO | — | Real-time communication |
-| CORS | 2.8 | Cross-origin resource sharing |
-| dotenv | 16.4 | Environment variables |
+| :--- | :---: | :--- |
+| **Express.js** | 4.19 | HTTP server |
+| **Groq SDK** | 0.9 | Client untuk Groq AI API |
+| **Socket.IO** | — | Real-time communication |
+| **CORS** | 2.8 | Cross-origin resource sharing |
+| **dotenv** | 16.4 | Environment variables |
 
 </details>
 
 <details>
 <summary><strong>Testing</strong></summary>
 
-<br/>
-
 | Teknologi | Versi | Fungsi |
-|-----------|:-----:|--------|
-| Playwright | 1.61 | End-to-end testing |
+| :--- | :---: | :--- |
+| **Playwright** | 1.61 | End-to-end testing |
 
 </details>
 
@@ -304,7 +285,7 @@ cd server && npm install && cd ..
 copy server\.env.example server\.env
 ```
 
-Buka `server/.env` dan isi:
+Buka `server/.env` dan isi dengan konfigurasi Anda:
 
 ```env
 GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -320,9 +301,9 @@ npm run dev
 ```
 
 | Service | URL |
-|---------|-----|
-| Frontend | http://localhost:5173 |
-| Backend | http://localhost:3001 |
+| :--- | :--- |
+| **Frontend** | `http://localhost:5173` |
+| **Backend** | `http://localhost:3001` |
 
 ---
 
@@ -331,7 +312,7 @@ npm run dev
 File environment ditempatkan di `server/.env`:
 
 | Variabel | Wajib | Default | Deskripsi |
-|----------|:-----:|:-------:|-----------|
+| :--- | :---: | :---: | :--- |
 | `GROQ_API_KEY` | ✅ | — | API key dari [Groq Cloud](https://console.groq.com) |
 | `PORT` | ❌ | `3001` | Port untuk backend proxy server |
 
@@ -344,7 +325,7 @@ File environment ditempatkan di `server/.env`:
 <details>
 <summary>Tampilkan struktur lengkap</summary>
 
-```
+```text
 Project Deteksi Air Asam Tambang (1.2)/
 ├── index.html                        # Entry point HTML
 ├── package.json                      # Dependencies & scripts frontend
@@ -391,6 +372,479 @@ Project Deteksi Air Asam Tambang (1.2)/
 ```
 
 </details>
+
+---
+
+## 📊 Diagram Arsitektur
+
+Dokumen ini berisi kumpulan diagram arsitektur untuk project SIMPATI-AAT. Catatan: ERD di bagian akhir adalah model data konseptual yang disarankan jika histori sensor, konfigurasi, notifikasi, dan hasil AI ingin disimpan permanen di database. 
+
+### 1. IoT Network / Sensor Topology Diagram
+
+```mermaid
+flowchart LR
+  subgraph fieldArea["Area Tambang"]
+    pondOne["Kolam Pengendap 1"]
+    pondTwo["Kolam Pengendap 2"]
+
+    subgraph nodeOne["Node KDC01"]
+      phOne["Sensor pH"]
+      tdsOne["Sensor TDS"]
+      espOne["ESP32"]
+      loraOne["LoRa Transmitter"]
+      phOne -->|Data pH| espOne
+      tdsOne -->|Data TDS| espOne
+      espOne -->|Payload telemetry| loraOne
+    end
+
+    subgraph nodeTwo["Node KDC02"]
+      phTwo["Sensor pH"]
+      tdsTwo["Sensor TDS"]
+      espTwo["ESP32"]
+      loraTwo["LoRa Transmitter"]
+      phTwo -->|Data pH| espTwo
+      tdsTwo -->|Data TDS| espTwo
+      espTwo -->|Payload telemetry| loraTwo
+    end
+
+    pondOne --- phOne
+    pondOne --- tdsOne
+    pondTwo --- phTwo
+    pondTwo --- tdsTwo
+  end
+
+  loraOne -->|LoRa packet| gateway["LoRa Gateway"]
+  loraTwo -->|LoRa packet| gateway
+  gateway -->|HTTP or serial bridge| externalApi["External API Server :3000"]
+  externalApi -->|Socket.IO sensor-update| frontend["Dashboard React :5173"]
+  externalApi -->|REST sensor-data| frontend
+  frontend -->|AI request| aiProxy["Express AI Proxy :3001"]
+  aiProxy -->|HTTPS prompt| groq["Groq Cloud API"]
+```
+
+### 2. Component Diagram Frontend
+
+```mermaid
+flowchart TB
+  main["main.jsx"]
+  provider["SensorProvider"]
+  app["App.jsx"]
+  sidebar["Sidebar"]
+  header["Header"]
+  globalAlert["GlobalDangerAlert"]
+
+  main --> provider
+  provider --> app
+  app --> sidebar
+  app --> globalAlert
+
+  subgraph pages["Halaman Aplikasi"]
+    dashboard["DashboardPage"]
+    analytics["AnalyticsPage"]
+    history["HistoryPage"]
+    device["DevicePage"]
+    config["ConfigPage"]
+    settings["SettingsPage"]
+  end
+
+  app --> dashboard
+  app --> analytics
+  app --> history
+  app --> device
+  app --> config
+  app --> settings
+  dashboard --> header
+
+  subgraph sensorContext["SensorContext State"]
+    liveState["currentPh, currentTds, systemStatus"]
+    nodeState["nodes, selectedNode, getNodeStatus"]
+    historyState["chartData, historyData"]
+    thresholdState["phThresholdMin, phThresholdMax, tdsThreshold"]
+    notificationState["notifications, notificationSettings"]
+    audioState["audioToggleState, buzzerActive, showDangerToast"]
+  end
+
+  provider --> liveState
+
+  subgraph dashboardComponents["Dashboard Components"]
+    metricCard["MetricCard"]
+    realtimeChart["RealTimeChart"]
+    telemetryChart["TelemetryChartContainer"]
+    alertBanner["AlertBanner"]
+    actionModal["ActionModal"]
+    recentLogs["RecentLogsTable"]
+  end
+
+  dashboard --> metricCard
+
+  subgraph analyticsComponents["Analytics Components"]
+    stats["StatsModule"]
+    trend["TrendModule"]
+    anomaly["AnomalyModule"]
+    forecast["ForecastModule"]
+    compare["CompareModule"]
+    aiSummary["AISummary"]
+  end
+
+  analytics --> stats
+
+  subgraph integration["Integrasi Browser"]
+    socketClient["Socket.IO Client"]
+    restClient["REST Fetch Client"]
+    localStorageClient["localStorage"]
+    audioClient["Web Audio API"]
+    groqClient["src/utils/groq.js"]
+  end
+
+  liveState --> socketClient
+  liveState --> restClient
+  liveState --> localStorageClient
+  liveState --> audioClient
+  metricCard --> groqClient
+  stats --> groqClient
+```
+
+### 3. Component Diagram Backend
+
+```mermaid
+flowchart TB
+  browser["Frontend React"]
+  expressApp["Express App :3001"]
+  cors["CORS Middleware"]
+  jsonParser["JSON Body Parser"]
+  validator["validateSensorData Middleware"]
+  healthRoute["GET /health"]
+  insightRoute["POST /api/ai/insight"]
+  actionRoute["POST /api/ai/action-plan"]
+  callGroq["callGroq Helper"]
+  modelSelector["Model Selector"]
+  responseHandler["Consistent JSON Response"]
+  envConfig["server/.env GROQ_API_KEY"]
+  groqSdk["Groq SDK Client"]
+  groqApi["Groq Cloud API"]
+
+  browser -->|REST request| expressApp
+  expressApp --> cors
+  cors --> jsonParser
+  jsonParser --> healthRoute
+  jsonParser --> validator
+  validator --> insightRoute
+  validator --> actionRoute
+
+  insightRoute -->|fast insight prompt| callGroq
+  actionRoute -->|reasoning JSON prompt| callGroq
+  callGroq --> modelSelector
+  modelSelector -->|llama-3.1-8b-instant| groqSdk
+  modelSelector -->|llama-3.3-70b-versatile| groqSdk
+  envConfig --> groqSdk
+  groqSdk -->|HTTPS| groqApi
+  groqApi --> groqSdk
+  groqSdk --> callGroq
+  callGroq --> responseHandler
+  responseHandler --> browser
+
+  callGroq -->|429, 401, 503, invalid JSON| responseHandler
+```
+
+### 4. State Diagram Status Sensor
+
+```mermaid
+stateDiagram-v2
+  [*] --> Initializing
+  Initializing --> Online: Data pertama diterima
+  Initializing --> Offline: Tidak ada data atau koneksi gagal
+
+  Online --> Aman: pH dalam ambang dan TDS dalam ambang
+  Online --> Bahaya: pH di luar ambang atau TDS melewati ambang
+
+  Aman --> Bahaya: Threshold dilanggar
+  Bahaya --> Aman: Nilai kembali normal
+
+  Aman --> Offline: Node tidak mengirim data
+  Bahaya --> Offline: Node tidak mengirim data
+  Offline --> Online: Data baru diterima
+
+  Offline --> Simulated: API tidak tersedia dan fallback aktif
+  Simulated --> Aman: Data simulasi normal
+  Simulated --> Bahaya: Data simulasi melanggar threshold
+
+  Aman --> [*]: Dashboard ditutup
+  Bahaya --> [*]: Dashboard ditutup
+  Offline --> [*]: Dashboard ditutup
+```
+
+### 5. Alert Workflow Diagram
+
+```mermaid
+flowchart TB
+  newData["Data sensor diterima"]
+  updateState["Update currentPh, currentTds, nodes, chartData"]
+  checkThreshold["Cek threshold pH dan TDS"]
+  safeDecision{"Status BAHAYA?"}
+  setSafe["Set systemStatus AMAN"]
+  setDanger["Set systemStatus BAHAYA"]
+  showToast["Tampilkan GlobalDangerAlert"]
+  createDangerNotification["Tambah notifikasi DANGER"]
+  quietDecision{"Quiet hours aktif?"}
+  soundDecision{"Sound enabled dan audio toggle aktif?"}
+  playAlarm["Bunyikan alarm"]
+  muted["Jangan bunyikan alarm"]
+  clearToast["Sembunyikan danger toast"]
+  createSuccessNotification["Tambah notifikasi SUCCESS jika pulih"]
+  offlineDecision{"Node berubah offline?"}
+  offlineNotification["Tambah notifikasi OFFLINE"]
+
+  newData --> updateState
+  updateState --> checkThreshold
+  checkThreshold --> safeDecision
+  safeDecision -->|Ya| setDanger
+  safeDecision -->|Tidak| setSafe
+
+  setDanger --> showToast
+  setDanger --> createDangerNotification
+  setDanger --> quietDecision
+  quietDecision -->|Ya| muted
+  quietDecision -->|Tidak| soundDecision
+  soundDecision -->|Ya| playAlarm
+  soundDecision -->|Tidak| muted
+
+  setSafe --> clearToast
+  setSafe --> createSuccessNotification
+
+  updateState --> offlineDecision
+  offlineDecision -->|Ya| offlineNotification
+  offlineDecision -->|Tidak| checkThreshold
+```
+
+### 6. Use Case Diagram
+
+```mermaid
+flowchart LR
+  operator["Operator Tambang"]
+  engineer["Environment Engineer"]
+  admin["Admin Sistem"]
+  sensorNode["ESP32 or LoRa Node"]
+  groqService["Groq AI Service"]
+
+  subgraph systemBoundary["SIMPATI-AAT"]
+    monitor["Memantau kualitas air real-time"]
+    viewDashboard["Melihat dashboard pH dan TDS"]
+    viewAnalytics["Melihat analitik dan prediksi"]
+    viewHistory["Melihat riwayat data sensor"]
+    exportData["Ekspor data ke Excel"]
+    manageThreshold["Mengatur ambang pH dan TDS"]
+    manageNotifications["Mengatur notifikasi dan quiet hours"]
+    receiveAlert["Menerima alert BAHAYA atau OFFLINE"]
+    requestInsight["Meminta AI insight"]
+    requestActionPlan["Meminta AI action plan"]
+    sendTelemetry["Mengirim telemetry sensor"]
+    checkDevice["Memantau status node"]
+  end
+
+  operator --> viewDashboard
+  operator --> receiveAlert
+  operator --> requestActionPlan
+  engineer --> monitor
+  engineer --> viewAnalytics
+  engineer --> viewHistory
+  engineer --> exportData
+  engineer --> requestInsight
+  engineer --> requestActionPlan
+  admin --> manageThreshold
+  admin --> manageNotifications
+  admin --> checkDevice
+  sensorNode --> sendTelemetry
+  groqService --> requestInsight
+  groqService --> requestActionPlan
+
+  monitor --> viewDashboard
+  viewDashboard --> receiveAlert
+  viewAnalytics --> requestInsight
+```
+
+### 7. ERD / Data Model Diagram
+
+```mermaid
+erDiagram
+  USER {
+    string id PK
+    string name
+    string role
+    boolean sessionActive
+    datetime createdAt
+    datetime updatedAt
+  }
+
+  SENSOR_NODE {
+    string id PK
+    string name
+    string location
+    string hardwareType
+    boolean online
+    datetime lastUpdate
+    datetime createdAt
+    datetime updatedAt
+  }
+
+  SENSOR_READING {
+    string id PK
+    string nodeId FK
+    float ph
+    int tds
+    string status
+    datetime timestamp
+    datetime createdAt
+  }
+
+  THRESHOLD_CONFIG {
+    string id PK
+    string nodeId FK
+    float phMin
+    float phMax
+    int tdsMax
+    string scope
+    datetime createdAt
+    datetime updatedAt
+  }
+
+  NOTIFICATION {
+    string id PK
+    string nodeId FK
+    string type
+    string message
+    boolean unread
+    datetime createdAt
+  }
+
+  NOTIFICATION_SETTING {
+    string id PK
+    string userId FK
+    boolean soundEnabled
+    boolean visualEnabled
+    boolean quietHoursEnabled
+    string quietStart
+    string quietEnd
+    string frequency
+    datetime updatedAt
+  }
+
+  AI_REQUEST {
+    string id PK
+    string nodeId FK
+    string readingId FK
+    string requestType
+    string model
+    string status
+    datetime createdAt
+  }
+
+  AI_RESULT {
+    string id PK
+    string aiRequestId FK
+    string insightText
+    string actionPlanJson
+    string errorCode
+    datetime createdAt
+  }
+
+  USER ||--o{ NOTIFICATION_SETTING : "owns"
+  SENSOR_NODE ||--o{ SENSOR_READING : "produces"
+  SENSOR_NODE ||--o{ THRESHOLD_CONFIG : "uses"
+  SENSOR_NODE ||--o{ NOTIFICATION : "triggers"
+  SENSOR_NODE ||--o{ AI_REQUEST : "analyzed_by"
+  SENSOR_READING ||--o{ AI_REQUEST : "included_in"
+  AI_REQUEST ||--|| AI_RESULT : "returns"
+```
+
+### 8. Security / Trust Boundary Diagram
+
+```mermaid
+flowchart TB
+  subgraph publicZone["Public or User Device Zone"]
+    userBrowser["User Browser"]
+    reactApp["React App :5173"]
+    localStorageArea["Browser localStorage"]
+  end
+
+  subgraph sensorZone["Mine Sensor Network Zone"]
+    espNodes["ESP32 LoRa Sensor Nodes"]
+    gateway["LoRa Gateway"]
+    externalApi["External API Server :3000"]
+  end
+
+  subgraph appServerZone["Application Server Zone"]
+    aiProxy["Express AI Proxy :3001"]
+    envFile["server/.env"]
+    validation["Request Validation"]
+    corsPolicy["Localhost CORS Policy"]
+  end
+
+  subgraph thirdPartyZone["Third Party Cloud Zone"]
+    groqApi["Groq Cloud API"]
+  end
+
+  userBrowser --> reactApp
+  reactApp -->|Stores UI preferences and thresholds| localStorageArea
+  espNodes -->|Sensor payload| gateway
+  gateway -->|Telemetry ingress| externalApi
+  externalApi -->|Socket.IO and REST data| reactApp
+  reactApp -->|AI request without API key| aiProxy
+  aiProxy --> validation
+  aiProxy --> corsPolicy
+  envFile -->|GROQ_API_KEY only on server| aiProxy
+  aiProxy -->|HTTPS request with API key| groqApi
+  groqApi -->|AI result| aiProxy
+  aiProxy -->|Sanitized JSON response| reactApp
+```
+
+### 9. Failure Handling Diagram
+
+```mermaid
+flowchart TB
+  startFlow["Dashboard aktif"]
+  connectSocket["Connect ke Socket.IO :3000"]
+  socketDecision{"Socket connected?"}
+  receiveSocket["Terima sensor-update"]
+  pollLatest["Polling REST /api/sensor-data/latest"]
+  latestDecision{"Data latest tersedia?"}
+  fetchDummy["Fetch /api/sensor-data/dummy"]
+  dummyDecision{"Dummy API tersedia?"}
+  localSimulation["Generate simulasi lokal"]
+  updateUi["Update UI, chart, node, history"]
+
+  aiRequest["User meminta AI insight atau action plan"]
+  proxyDecision{"Backend :3001 aktif?"}
+  callGroq["Backend memanggil Groq API"]
+  groqDecision{"Groq berhasil?"}
+  rateLimit["Tampilkan pesan rate limit dan retryAfter"]
+  authFailure["Tampilkan error API key invalid"]
+  invalidJson["Tampilkan error AI response invalid"]
+  genericAiFallback["Tampilkan fallback AI di frontend"]
+  showAiResult["Tampilkan hasil AI"]
+
+  startFlow --> connectSocket
+  connectSocket --> socketDecision
+  socketDecision -->|Ya| receiveSocket
+  socketDecision -->|Tidak| pollLatest
+  receiveSocket --> updateUi
+  pollLatest --> latestDecision
+  latestDecision -->|Ya| updateUi
+  latestDecision -->|Tidak| fetchDummy
+  fetchDummy --> dummyDecision
+  dummyDecision -->|Ya| updateUi
+  dummyDecision -->|Tidak| localSimulation
+  localSimulation --> updateUi
+
+  aiRequest --> proxyDecision
+  proxyDecision -->|Tidak| genericAiFallback
+  proxyDecision -->|Ya| callGroq
+  callGroq --> groqDecision
+  groqDecision -->|Berhasil| showAiResult
+  groqDecision -->|429| rateLimit
+  groqDecision -->|401| authFailure
+  groqDecision -->|Invalid JSON| invalidJson
+  groqDecision -->|Error lain| genericAiFallback
+```
 
 ---
 
@@ -487,7 +941,7 @@ Mendapatkan rencana tindakan mitigasi lengkap (model penalaran tinggi).
 ### Error Codes
 
 | HTTP Status | Code | Deskripsi |
-|:-----------:|------|-----------|
+| :---: | :--- | :--- |
 | `400` | `INVALID_PAYLOAD` | Field `sensorData` tidak ditemukan |
 | `400` | `MISSING_FIELDS` | `ph`, `tds`, atau `nodeId` tidak lengkap |
 | `401` | `AUTH_INVALID` | API key Groq tidak valid |
@@ -511,7 +965,7 @@ npm run test:report   # Buka laporan test HTML
 ### Cakupan Test
 
 | Test Case | Deskripsi |
-|:---------:|-----------|
+| :---: | :--- |
 | **TC-01** | Navigasi dasar dashboard — memuat halaman dan elemen utama |
 | **TC-02** | Kondisi BAHAYA — banner alert muncul saat threshold terlampaui |
 | **TC-03** | Navigasi antar halaman (sidebar) |
@@ -523,7 +977,7 @@ npm run test:report   # Buka laporan test HTML
 ## 📦 NPM Scripts
 
 | Perintah | Fungsi |
-|----------|--------|
+| :--- | :--- |
 | `npm run dev` | Jalankan frontend + backend secara bersamaan |
 | `npm run dev:client` | Jalankan hanya frontend (Vite) |
 | `npm run dev:server` | Jalankan hanya backend (Express) |
@@ -550,7 +1004,7 @@ npm run test:report   # Buka laporan test HTML
 Proyek ini mengikuti [Conventional Commits](https://www.conventionalcommits.org/):
 
 | Prefix | Keterangan |
-|--------|-----------|
+| :--- | :--- |
 | `feat:` | Fitur baru |
 | `fix:` | Perbaikan bug |
 | `docs:` | Perubahan dokumentasi |
@@ -561,21 +1015,15 @@ Proyek ini mengikuti [Conventional Commits](https://www.conventionalcommits.org/
 
 ---
 
-### Dokumentasi Project 📷
-<br> Halaman Dashboard
-<img width="1644" height="1475" alt="image" src="https://github.com/user-attachments/assets/d2bbd5da-f5d7-498c-8aa4-00e58bfb784f" />
-<br>
-<br> Halaman History & Laporan
-<img width="1644" height="1197" alt="image" src="https://github.com/user-attachments/assets/813bcc66-7254-41c8-94f3-5a63181bdaa8" />
-<br>
-<br> Halaman Device
-<img width="1904" height="1034" alt="image" src="https://github.com/user-attachments/assets/d59e1c12-454f-426d-96b3-6a9e71a58c68" />
-<br>
-<br> Halaman Analis
-<img width="1644" height="3836" alt="image" src="https://github.com/user-attachments/assets/d196e9fa-52bb-4e9a-844b-fe9aada87719" />
+## 📷 Dokumentasi Project
+
+| Halaman Dashboard | Halaman History & Laporan |
+| :---: | :---: |
+| <img src="https://github.com/user-attachments/assets/d2bbd5da-f5d7-498c-8aa4-00e58bfb784f" alt="Halaman Dashboard" width="500"/> | <img src="https://github.com/user-attachments/assets/813bcc66-7254-41c8-94f3-5a63181bdaa8" alt="Halaman History" width="500"/> |
+| **Halaman Device** | **Halaman Analis** |
+| <img src="https://github.com/user-attachments/assets/d59e1c12-454f-426d-96b3-6a9e71a58c68" alt="Halaman Device" width="500"/> | <img src="https://github.com/user-attachments/assets/d196e9fa-52bb-4e9a-844b-fe9aada87719" alt="Halaman Analis" width="500"/> |
 
 ---
-
 
 ## 📄 Lisensi
 
