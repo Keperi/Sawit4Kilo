@@ -64,15 +64,15 @@ const TopHighestPhCard = ({ historyData }) => {
         <p className="text-[12px] font-normal text-[#98A2B3] mt-1.5">Puncak tingkat keasaman (pH terendah) yang terekam sistem</p>
       </div>
 
-      <div className="flex-1 w-full overflow-x-auto pb-2">
+      <div className="flex-1 w-full pb-2">
         {topPhData.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 w-full min-w-[750px]">
+          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 w-full">
             {topPhData.map((item, idx) => {
               const details = getSeverityDetails(item.ph);
               return (
                 <div
                   key={idx}
-                  className={`flex flex-col justify-between p-4 rounded-[14px] cursor-pointer transition-[filter] duration-200 hover:brightness-110 min-h-[220px] ${details.bg}`}
+                  className={`flex flex-col justify-between p-3 sm:p-4 rounded-[14px] cursor-pointer transition-[filter] duration-200 hover:brightness-110 min-h-[180px] sm:min-h-[220px] ${details.bg}`}
                 >
                   {/* Top: Rank, Node, Time, and Issue */}
                   <div className="shrink-0 flex flex-col w-full">
@@ -96,7 +96,7 @@ const TopHighestPhCard = ({ historyData }) => {
                   
                   {/* Center: BIG pH */}
                   <div className="flex-1 flex flex-col items-center justify-center py-2">
-                    <div className={`text-[46px] font-black tracking-tighter leading-none drop-shadow-sm ${details.text}`}>
+                    <div className={`text-[36px] sm:text-[46px] font-black tracking-tighter leading-none drop-shadow-sm ${details.text}`}>
                       {item.ph.toFixed(2)}
                     </div>
                     <div className={`text-[10px] font-semibold uppercase tracking-widest mt-1 ${details.subtext}`}>

@@ -5,7 +5,7 @@ import ThresholdGlobalPanel from '../components/device/ThresholdGlobalPanel';
 import NodeCard from '../components/device/NodeCard';
 import NodeDetailSidebar from '../components/device/NodeDetailSidebar';
 
-const DevicePage = ({ setActivePage }) => {
+const DevicePage = ({ setActivePage, onOpenSidebar }) => {
   const { systemStatus, nodes } = useContext(SensorContext);
   const [selectedNodeDetail, setSelectedNodeDetail] = useState(null);
 
@@ -30,6 +30,7 @@ const DevicePage = ({ setActivePage }) => {
       <Header
         title="Device"
         systemStatus={systemStatus}
+        onOpenSidebar={onOpenSidebar}
       />
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6">

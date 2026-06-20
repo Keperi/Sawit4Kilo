@@ -4,7 +4,7 @@ import Header from '../components/layout/Header';
 import Button from '../components/ui/Button';
 import { Settings01, AlertTriangle, CheckCircle, AlertOctagon } from '@untitledui/icons';
 
-const Settings = () => {
+const Settings = ({ onOpenSidebar }) => {
   const { systemStatus } = useContext(SensorContext);
 
   const [formData, setFormData] = useState({
@@ -141,6 +141,7 @@ const Settings = () => {
           subtitle="Konfigurasi URL endpoint API dan interval pengiriman data perangkat keras"
           icon={Settings01}
           systemStatus={systemStatus}
+          onOpenSidebar={onOpenSidebar}
         />
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
@@ -189,6 +190,7 @@ const Settings = () => {
         subtitle="Konfigurasi URL endpoint API dan interval pengiriman data perangkat keras"
         icon={Settings01}
         systemStatus={systemStatus}
+        onOpenSidebar={onOpenSidebar}
       />
 
       {/* Scrollable Content */}

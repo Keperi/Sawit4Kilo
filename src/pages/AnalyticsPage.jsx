@@ -17,7 +17,7 @@ import {
 import { getAIInsight, getActionPlan } from '../utils/groq';
 import { BarChart02 } from '@untitledui/icons';
 
-const AnalyticsPage = () => {
+const AnalyticsPage = ({ onOpenSidebar }) => {
   const { systemStatus, historyData, nodes, phThresholdMin, tdsThreshold } = useContext(SensorContext);
   const [period, setPeriod] = useState('7d');
   const [selectedNode, setSelectedNode] = useState('ALL');
@@ -203,7 +203,7 @@ Buat ringkasan 3-5 kalimat dalam Bahasa Indonesia yang menjelaskan kondisi kesel
   const periodLabel = period === '24h' ? '24 Jam' : period === '7d' ? '7 Hari' : '30 Hari';
   return (
     <div className="flex flex-col h-full bg-[#F5F5F5] overflow-hidden">
-      <Header title="Analisis" systemStatus={systemStatus} />
+      <Header title="Analisis" systemStatus={systemStatus} onOpenSidebar={onOpenSidebar} />
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6">
         <div className="flex flex-col gap-6 min-h-full pb-8">

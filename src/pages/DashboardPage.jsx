@@ -9,7 +9,7 @@ import StatusBar from '../components/layout/StatusBar';
 import AlertBanner from '../components/dashboard/AlertBanner';
 import ActionModal from '../components/dashboard/ActionModal';
 
-const DashboardPage = ({ setActivePage }) => {
+const DashboardPage = ({ setActivePage, onOpenSidebar }) => {
   const {
     userState,
     systemStatus,
@@ -78,6 +78,7 @@ const DashboardPage = ({ setActivePage }) => {
         systemStatus={systemStatus}
         userName={userState?.name}
         showNodeSelector
+        onOpenSidebar={onOpenSidebar}
       />
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6">

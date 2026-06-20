@@ -62,7 +62,7 @@ const AlertBanner = ({ message, location, isDanger = true, systemStatus = 'AMAN'
     : 'decoration-[#22C55E] text-[#22C55E]';
 
   return (
-    <div className={`border rounded-[10px] p-5 mb-[18px] flex gap-4 items-start ${containerBg}`}>
+    <div className={`border rounded-[10px] p-4 sm:p-5 mb-[18px] flex flex-col sm:flex-row gap-3 sm:gap-4 items-start ${containerBg}`}>
       <div className={`w-[36px] h-[36px] rounded-[7px] flex items-center justify-center shrink-0 ${iconBg}`}>
         {isOffline ? (
           <AlertCircle size={18} strokeWidth={2.5} className="text-slate-500" />

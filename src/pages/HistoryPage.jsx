@@ -12,7 +12,7 @@ import SweetSpotScatterChart from '../components/dashboard/SweetSpotScatterChart
 
 const ITEMS_PER_PAGE = 15;
 
-const HistoryPage = () => {
+const HistoryPage = ({ onOpenSidebar }) => {
   const { historyData, systemStatus } = useContext(SensorContext);
 
   const [dateFrom, setDateFrom] = useState('');
@@ -66,6 +66,7 @@ const HistoryPage = () => {
       <Header
         title="Histori & Laporan"
         systemStatus={systemStatus}
+        onOpenSidebar={onOpenSidebar}
       />
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6">

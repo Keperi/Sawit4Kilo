@@ -24,13 +24,13 @@ const StatusBar = memo(({ selectedNode, lastTimestamp, systemStatus }) => {
   return (
     <div
       id="status-bar"
-      className="h-[36px] bg-white border-t border-[#EAECF0] flex items-center justify-between px-6 shrink-0"
+      className="h-[36px] bg-white border-t border-[#EAECF0] flex items-center justify-between px-3 sm:px-6 shrink-0"
     >
-      <div className={`flex items-center gap-[5px] text-[11px] ${statusColorClass}`}>
-        <Circle size={13} fill="currentColor" strokeWidth={0} className={dotColorClass} />
-        <span>{statusMsg}</span>
+      <div className={`flex items-center gap-[5px] text-[11px] ${statusColorClass} min-w-0`}>
+        <Circle size={13} fill="currentColor" strokeWidth={0} className={`${dotColorClass} shrink-0`} />
+        <span className="truncate">{statusMsg}</span>
       </div>
-      <div className="text-[11px] text-[#9BA3AE]">
+      <div className="text-[11px] text-[#9BA3AE] hidden sm:block shrink-0">
         Interval: 1 detik · ISA-101
       </div>
     </div>
