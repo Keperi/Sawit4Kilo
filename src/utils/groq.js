@@ -1,10 +1,10 @@
 // ============================================================
 // KIDECO - Frontend Groq AI Client
 // Memanggil backend proxy server (TIDAK langsung ke Groq API)
-// API Key aman tersimpan di server/.env, tidak terekspos ke browser
 // ============================================================
 
-const GROQ_PROXY_BASE_URL = 'http://localhost:3001/api/ai';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+const GROQ_PROXY_BASE_URL = `${API_BASE_URL}/ai`;
 
 // ──────────────────────────────────────────────────────────
 // Helper: Request ke backend proxy dengan error handling

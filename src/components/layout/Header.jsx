@@ -1,5 +1,5 @@
 import React, { memo, useContext, useState, useEffect, useRef } from 'react';
-import { Bell01, AlertTriangle, CheckCircle, AlertCircle } from '@untitledui/icons';
+import { Bell01, AlertTriangle, CheckCircle, AlertCircle, Menu01 } from '@untitledui/icons';
 import { SensorContext } from '../../context/SensorContext';
 
 const Header = memo(({
@@ -11,8 +11,9 @@ const Header = memo(({
   subtitle,
   showNodeSelector = false,
   showStatusBadge = true,
+  onOpenSidebar,
 }) => {
-  const { showDangerToast, setShowDangerToast, notifications, setNotifications } = useContext(SensorContext);
+  const { showDangerToast, setShowDangerToast, notifications, setNotifications, dashboardMode } = useContext(SensorContext);
   const isDanger = systemStatus === 'BAHAYA';
   const isGreetingMode = !title;
 
@@ -43,37 +44,67 @@ const Header = memo(({
   return (
     <header
       id="header-bar"
-      className="bg-white border-b border-[#B9C8D7]/30 flex items-center justify-between px-6 py-4 shrink-0 relative"
+      className="bg-white border-b border-[#B9C8D7]/30 flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 shrink-0 relative gap-2"
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+        {/* ── Hamburger (mobile only) ── */}
+        {onOpenSidebar && (
+          <button
+            onClick={onOpenSidebar}
+            className="md:hidden w-[36px] h-[36px] rounded-[10px] bg-[#F7F8FA] border border-[#EAECF0] flex items-center justify-center cursor-pointer hover:bg-[#F5F5F5] transition-colors shrink-0"
+            aria-label="Buka menu navigasi"
+          >
+            <Menu01 size={18} strokeWidth={1.5} className="text-[#8C9BAF]" />
+          </button>
+        )}
+
         {isGreetingMode ? (
-          <>
-            <h2 className="text-[16px] font-bold text-[#202020] leading-tight">
-              Welcome back, {userName?.split(' ')[0] || 'Admin'}!
-            </h2>
-            <p className="text-[12px] text-[#B9C8D7]">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h2 className="text-[14px] sm:text-[16px] font-bold text-[#202020] leading-tight truncate">
+                Welcome back, {userName?.split(' ')[0] || 'Admin'}!
+              </h2>
+              {dashboardMode === 'sandbox' && (
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase bg-amber-500/10 text-amber-600 border border-amber-500/20 select-none shrink-0">
+                  Sandbox
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] sm:text-[12px] text-[#B9C8D7] mt-0.5 truncate">
               Monitoring KIDECO Mining Water Quality
             </p>
-          </>
+          </div>
         ) : (
-          <h1 className="text-[16px] font-bold text-[#202020]">{title}</h1>
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="text-[14px] sm:text-[16px] font-bold text-[#202020] truncate">{title}</h1>
+            {dashboardMode === 'sandbox' && (
+              <span className="px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase bg-amber-500/10 text-amber-600 border border-amber-500/20 select-none shrink-0">
+                Sandbox
+              </span>
+            )}
+          </div>
         )}
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         {showStatusBadge && systemStatus && (
-          isDanger ? (
+          systemStatus === 'OFFLINE' ? (
+            <div data-testid="offline-badge" className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-slate-200 bg-slate-100 text-slate-500 text-[11px] font-bold select-none">
+              <AlertCircle size={12} strokeWidth={2} />
+              Offline
+            </div>
+          ) : isDanger ? (
             <button
               data-testid="danger-badge-btn"
               onClick={() => setShowDangerToast((prev) => !prev)}
               title="Klik untuk tampilkan/sembunyikan detail peringatan"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#FF4628]/20 bg-[#FF4628]/10 text-[#FF4628] text-[11px] font-bold cursor-pointer hover:bg-[#FF4628]/20 transition-all select-none active:scale-95 outline-none shadow-3xs"
+              className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-full border border-[#FF4628]/20 bg-[#FF4628]/10 text-[#FF4628] text-[11px] font-bold cursor-pointer hover:bg-[#FF4628]/20 transition-all select-none active:scale-95 outline-none shadow-3xs"
             >
               <AlertTriangle size={12} strokeWidth={2} />
-              Bahaya
+              <span className="hidden sm:inline">Bahaya</span>
             </button>
           ) : (
-            <div data-testid="safe-badge" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#16A34A]/20 bg-[#16A34A]/10 text-[#16A34A] text-[11px] font-bold">
+            <div data-testid="safe-badge" className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#16A34A]/20 bg-[#16A34A]/10 text-[#16A34A] text-[11px] font-bold">
               <CheckCircle size={12} strokeWidth={2} />
               Aman
             </div>
@@ -85,7 +116,7 @@ const Header = memo(({
             id="node-selector"
             value={selectedNode}
             onChange={(e) => onNodeChange(e.target.value)}
-            className="h-[32px] px-3 bg-white border border-[#EAECF0] rounded-[8px] text-[12px] font-medium text-[#202020] cursor-pointer outline-none transition-colors focus:border-[#FF4628]"
+            className="h-[32px] px-2 sm:px-3 bg-white border border-[#EAECF0] rounded-[8px] text-[12px] font-medium text-[#202020] cursor-pointer outline-none transition-colors focus:border-[#FF4628]"
           >
             <option value="KDC01">KDC01</option>
             <option value="KDC02">KDC02</option>
@@ -108,7 +139,7 @@ const Header = memo(({
           </button>
 
           {isOpen && (
-            <div className="absolute right-0 top-[40px] w-[300px] bg-white border border-[#EAECF0] rounded-[12px] shadow-lg z-50 overflow-hidden">
+            <div className="absolute right-0 top-[40px] w-[calc(100vw-24px)] sm:w-[300px] max-w-[320px] bg-white border border-[#EAECF0] rounded-[12px] shadow-lg z-50 overflow-hidden">
               {/* Dropdown Header */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-[#EAECF0]">
                 <span className="text-[12px] font-bold text-[#202020]">Notifikasi Terbaru</span>

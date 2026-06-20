@@ -50,7 +50,7 @@ const GlobalDangerAlert = ({ activePage }) => {
   useEffect(() => {
     if (shouldPlayAudio) {
       if (!audioRef.current) {
-        audioRef.current = new Audio('/assets/sounds/alarm.mp3');
+        audioRef.current = new Audio('/assets/sounds/alarm_QenbR8T.mp3');
       }
       audioRef.current.play().catch((err) => {
         console.log('Audio autoplay blocked or failed', err);
@@ -93,8 +93,8 @@ const GlobalDangerAlert = ({ activePage }) => {
   }
 
   return (
-    <div data-testid="danger-toast" className="fixed top-[84px] right-6 z-50 animate-bounce-in">
-      <div className="bg-[#FEF9F8] border-2 border-[#E8533A] rounded-[12px] p-5 shadow-2xl flex items-start gap-4 max-w-sm relative">
+    <div data-testid="danger-toast" className="fixed top-[70px] sm:top-[84px] right-3 left-3 sm:left-auto sm:right-6 z-50 animate-bounce-in">
+      <div className="bg-[#FEF9F8] border-2 border-[#E8533A] rounded-[12px] p-4 sm:p-5 shadow-2xl flex items-start gap-3 sm:gap-4 max-w-none sm:max-w-sm relative">
         <div className="w-[40px] h-[40px] rounded-full bg-[#FEE8E2] flex items-center justify-center shrink-0">
           <AlertCircle size={24} strokeWidth={2.5} className="text-[#C84B2F] animate-pulse" />
         </div>

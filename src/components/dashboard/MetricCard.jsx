@@ -38,13 +38,15 @@ const MetricCard = memo(({
       ? 'text-[#FF4628]'
       : badgeType === 'warning'
       ? 'text-[#D97706]'
+      : badgeType === 'offline'
+      ? 'text-[#667085]'
       : 'text-[#16A34A]';
 
   const clampedBar = Math.min(100, Math.max(0, barCurrent));
   const remainingBar = 100 - clampedBar;
 
   return (
-    <div className="bg-white rounded-[12px] border border-[#EAECF0] p-5 flex flex-col gap-4">
+    <div className="bg-white rounded-[12px] border border-[#EAECF0] p-4 sm:p-5 flex flex-col gap-3 sm:gap-4">
 
       {/* ── Title ── */}
       <p className="text-[11px] font-semibold text-[#98A2B3] uppercase tracking-[0.07em] leading-none">
@@ -57,7 +59,7 @@ const MetricCard = memo(({
           <div className="animate-pulse bg-slate-100 h-10 w-24 rounded-lg" />
         ) : (
           <div className="flex items-baseline gap-1.5 leading-none">
-            <span className="text-[36px] font-bold text-[#101828] tracking-tight leading-none">
+            <span className="text-[28px] sm:text-[36px] font-bold text-[#101828] tracking-tight leading-none">
               {value}
             </span>
             {unit && (
@@ -69,7 +71,7 @@ const MetricCard = memo(({
         )}
 
         {deltaText && !isLoading && (
-          <span className={`text-[11px] font-semibold ${deltaColor} text-right leading-tight max-w-[90px]`}>
+          <span className={`text-[11px] font-semibold ${deltaColor} text-right leading-tight max-w-[80px] sm:max-w-[90px]`}>
             {deltaText}
           </span>
         )}
