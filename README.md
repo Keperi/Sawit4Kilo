@@ -124,34 +124,31 @@ Sistem dashboard berbasis **IoT + AI** untuk mendeteksi, memprediksi, dan member
 
 Arsitektur SIMPATI-AAT menggunakan pola **decoupled** — frontend dan backend terpisah, berkomunikasi via Socket.IO dan REST API.
 
-```text
-┌─────────────────────────────────────────────────────────────┐
-│                        USER / BROWSER                       │
-│                                                             │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │              Frontend (React + Vite) :5173            │  │
-│  │                                                       │  │
-│  │   Dashboard  │  Analytics  │  History  │  Config      │  │
-│  │       └──────────────┬──────────────────┘            │  │
-│  │              SensorContext (Socket.IO Client)         │  │
-│  └──────────────────────┼──────────────────────────────┘  │
-│                          │ Socket.IO + REST API             │
-│  ┌───────────────────────▼──────────────────────────────┐  │
-│  │              Backend (Express.js) :3001               │  │
-│  │                                                       │  │
-│  │         /api/ai/insight   │   /api/ai/action-plan     │  │
-│  └───────────────────────┬──────────────────────────────┘  │
-│                           │                                  │
-│  ┌────────────────────────▼─────────────────────────────┐  │
-│  │                  Groq Cloud API                       │  │
-│  │     Llama 3.1 8B (Insight)  │  Llama 3.3 70B (Plan)  │  │
-│  └──────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-                               ▲
-              ┌────────────────┘
-              │  External API Server :3000
-              │  ESP32/LoRa Sensor Nodes
-              └──────────────────────────
+```mermaid
+flowchart LR
+  subgraph iot["IoT Network"]
+    nodes["ESP32/LoRa Sensor Nodes"]
+    extApi["External API Server :3000"]
+    nodes -->|Payload| extApi
+  end
+
+  subgraph browser["User / Browser"]
+    ui["UI Pages<br>(Dashboard, Analytics, History, Config)"]
+    context["SensorContext<br>(Socket.IO Client)"]
+    ui --- context
+  end
+
+  subgraph server["Application Server"]
+    proxy["Backend Proxy :3001<br>/api/ai/insight<br>/api/ai/action-plan"]
+  end
+
+  subgraph cloud["Cloud Services"]
+    groq["Groq Cloud API<br>Llama 3.1 8B (Insight)<br>Llama 3.3 70B (Plan)"]
+  end
+
+  extApi -->|Socket.IO + REST| context
+  context -->|REST API| proxy
+  proxy -->|HTTPS| groq
 ```
 
 ### Komponen Utama
