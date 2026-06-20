@@ -24,7 +24,7 @@ const AboutSettings = () => {
               <div className="text-[12px] text-[#8C9BAF]">Water Quality Monitoring System</div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <div className="text-[10px] font-bold uppercase tracking-wider text-[#B9C8D7] mb-1">Versi</div>
               <div className="text-[13px] font-mono font-semibold text-[#202020]">v1.0.0</div>
@@ -79,7 +79,7 @@ const AboutSettings = () => {
         <div>
           <div className="text-[11px] font-bold tracking-[0.07em] uppercase text-[#B9C8D7] mb-3">Info Hardware</div>
           <div className="bg-[#F7F8FA] border border-[#EAECF0] rounded-[12px] p-5">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider text-[#B9C8D7] mb-1">Node Terdaftar</div>
                 <div className="text-[13px] font-semibold text-[#202020]">{nodes.length} unit</div>

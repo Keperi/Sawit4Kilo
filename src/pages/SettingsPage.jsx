@@ -22,11 +22,13 @@ const tabs = [
 const SettingsPage = ({ isOpen, onClose }) => {
   const { systemStatus } = useContext(SensorContext);
   const [activeTab, setActiveTab] = useState('profile');
+  const [mobileView, setMobileView] = useState('menu'); // 'menu' or 'content'
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
+      setMobileView('menu');
       requestAnimationFrame(() => setIsVisible(true));
     }
   }, [isOpen]);
@@ -87,7 +89,7 @@ const SettingsPage = ({ isOpen, onClose }) => {
         onClick={handleClose}
       />
 
-      <div className={`relative w-full max-w-[900px] h-[85vh] bg-white rounded-[16px] border border-[#EAECF0] shadow-xl flex overflow-hidden transition-all duration-200 ${opacity} ${scale}`}>
+      <div className={`relative w-full max-w-[900px] h-[85vh] bg-white rounded-[16px] border border-[#EAECF0] shadow-xl flex flex-col md:flex-row overflow-hidden transition-all duration-200 ${opacity} ${scale}`}>
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 z-10 w-[32px] h-[32px] rounded-[8px] bg-[#F7F8FA] border border-[#EAECF0] flex items-center justify-center cursor-pointer hover:bg-[#F5F5F5] transition-colors"
@@ -95,7 +97,12 @@ const SettingsPage = ({ isOpen, onClose }) => {
           <X size={16} strokeWidth={2} className="text-[#8C9BAF]" />
         </button>
 
-        <div className="w-[240px] shrink-0 border-r border-[#EAECF0] p-4 overflow-y-auto">
+        {/* Sidebar menu */}
+        <div className={`shrink-0 p-4 overflow-y-auto ${
+          mobileView === 'content'
+            ? 'hidden md:block'
+            : 'w-full md:w-[240px] flex-1 md:flex-none border-b md:border-b-0 md:border-r border-[#EAECF0]'
+        }`}>
           <div className="flex items-center gap-2 mb-6 px-3">
             <Settings01 size={18} strokeWidth={2} className="text-[#202020]" />
             <span className="text-[15px] font-bold text-[#202020]">Pengaturan</span>
@@ -113,7 +120,10 @@ const SettingsPage = ({ isOpen, onClose }) => {
                   return (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        setMobileView('content');
+                      }}
                       className={`
                         w-full flex items-center gap-2.5 px-3 py-2 rounded-[8px] text-[13px] transition-all duration-150 text-left
                         ${isActive
@@ -136,7 +146,22 @@ const SettingsPage = ({ isOpen, onClose }) => {
           ))}
         </div>
 
-        <div className="flex-1 p-6 overflow-y-auto">
+        {/* Content Area */}
+        <div className={`flex-1 p-5 sm:p-6 overflow-y-auto ${
+          mobileView === 'menu' ? 'hidden md:block' : 'block'
+        }`}>
+          {/* Back button on mobile */}
+          <div className="md:hidden flex items-center mb-6 border-b border-[#EAECF0] pb-4">
+            <button
+              onClick={() => setMobileView('menu')}
+              className="flex items-center gap-2 text-[14px] font-bold text-[#8C9BAF] hover:text-[#202020] transition-colors cursor-pointer"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              Kembali ke Menu
+            </button>
+          </div>
           {renderContent()}
         </div>
       </div>

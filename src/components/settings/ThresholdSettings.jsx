@@ -64,7 +64,7 @@ const ThresholdSettings = () => {
       )}
 
       <div className="flex flex-col gap-5">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-[13px] font-bold text-[#202020] mb-1.5">Batas Minimum pH</label>
             <input

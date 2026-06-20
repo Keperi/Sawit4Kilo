@@ -32,7 +32,7 @@ const ProfileSettings = () => {
       )}
 
       {/* Avatar Section */}
-      <div className="bg-[#F7F8FA] border border-[#EAECF0] rounded-[12px] p-5 flex items-center gap-5 mb-8">
+      <div className="bg-[#F7F8FA] border border-[#EAECF0] rounded-[12px] p-5 flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 sm:gap-5 mb-8">
         <div className="relative">
           <div className="w-[72px] h-[72px] rounded-full bg-[#B9C8D7]/30 flex items-center justify-center">
             <img
@@ -54,7 +54,7 @@ const ProfileSettings = () => {
 
       {/* Form Fields */}
       <div className="flex flex-col gap-5">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-[13px] font-bold text-[#202020] mb-1.5">Nama Lengkap</label>
             <input
