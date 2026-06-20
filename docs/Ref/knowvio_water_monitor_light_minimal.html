@@ -1,0 +1,281 @@
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+.d{display:flex;height:100vh;min-height:700px;background:#F7F8FA;font-family:var(--font-sans);font-size:14px;color:#111;}
+
+.sb{width:216px;min-width:216px;background:#fff;border-right:1px solid #EAECF0;display:flex;flex-direction:column;}
+.sb-logo{padding:20px 18px 16px;border-bottom:1px solid #EAECF0;display:flex;align-items:center;gap:10px;}
+.sb-bars{display:flex;align-items:flex-end;gap:2px;}
+.sb-bars span{width:4px;border-radius:2px;background:#E8533A;}
+.nav-lbl{padding:20px 18px 6px;font-size:10px;color:#9BA3AE;letter-spacing:.08em;text-transform:uppercase;}
+.nav-a{display:flex;align-items:center;gap:9px;padding:8px 12px;margin:1px 6px;border-radius:8px;font-size:13px;color:#6B7280;cursor:pointer;}
+.nav-a:hover{background:#F7F8FA;color:#374151;}
+.nav-a.on{background:#FEF2EE;color:#E8533A;}
+.nav-a i{font-size:16px;}
+.sen-item{display:flex;align-items:center;gap:9px;padding:8px 12px;margin:1px 6px;border-radius:8px;cursor:pointer;}
+.sen-item:hover{background:#F7F8FA;}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dot.on{background:#16A34A;}
+.dot.off{background:#D1D5DB;}
+.sn{font-size:13px;color:#374151;font-weight:500;}
+.ss{font-size:11px;color:#9BA3AE;}
+.sb-foot{padding:14px 12px;border-top:1px solid #EAECF0;margin-top:auto;}
+.av{width:30px;height:30px;border-radius:50%;background:#FEF2EE;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#E8533A;flex-shrink:0;}
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{height:56px;background:#fff;border-bottom:1px solid #EAECF0;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.tb-l h2{font-size:15px;font-weight:500;color:#111;}
+.tb-l p{font-size:12px;color:#9BA3AE;}
+.tb-r{display:flex;align-items:center;gap:10px;}
+.badge-danger{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;background:#FEF2EE;border:1px solid #FDDDD6;font-size:12px;font-weight:500;color:#C84B2F;}
+.badge-danger i{font-size:13px;}
+.pdot{width:6px;height:6px;border-radius:50%;background:#E8533A;animation:p 1.6s ease-in-out infinite;}
+@keyframes p{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(1.4);}}
+.sel{display:flex;align-items:center;gap:6px;padding:6px 11px;border-radius:8px;border:1px solid #EAECF0;background:#fff;font-size:12px;color:#374151;cursor:pointer;}
+.sel i{font-size:15px;color:#9BA3AE;}
+.nb{width:34px;height:34px;border-radius:8px;border:1px solid #EAECF0;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.nb i{font-size:17px;color:#6B7280;}
+.nbd{position:absolute;top:7px;right:7px;width:5px;height:5px;border-radius:50%;background:#E8533A;}
+
+.body{flex:1;overflow-y:auto;padding:20px 24px;}
+
+.alert{background:#FEF9F8;border:1px solid #FDDDD6;border-radius:10px;padding:13px 16px;margin-bottom:18px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.al-l{display:flex;gap:10px;align-items:flex-start;}
+.al-ic{width:30px;height:30px;border-radius:7px;background:#FEE8E2;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.al-ic i{font-size:15px;color:#C84B2F;}
+.al-t{font-size:13px;font-weight:500;color:#9B2617;}
+.al-t a{color:#E8533A;text-decoration:underline;}
+.al-d{font-size:12px;color:#C84B2F;margin-top:2px;}
+.al-d b{font-weight:500;}
+.al-btn{flex-shrink:0;padding:6px 13px;border-radius:7px;background:#E8533A;color:#fff;font-size:12px;font-weight:500;cursor:pointer;border:none;white-space:nowrap;}
+.al-btn:hover{background:#C84B2F;}
+
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.sc{background:#fff;border:1px solid #EAECF0;border-radius:10px;padding:16px;}
+.sc-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sc-lbl{font-size:11px;color:#9BA3AE;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:5px;}
+.sc-lbl i{font-size:13px;}
+.pill{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;}
+.pill.r{background:#FEE8E2;color:#9B2617;}
+.pill.y{background:#FEF3C7;color:#92400E;}
+.pill.g{background:#DCFCE7;color:#166534;}
+.sc-v{font-size:28px;font-weight:500;color:#111;line-height:1;}
+.sc-v.rv{color:#E8533A;}
+.sc-v.yv{color:#D97706;}
+.sc-v.cv{font-size:20px;color:#C84B2F;}
+.sc-u{font-size:11px;color:#9BA3AE;margin-top:4px;}
+
+.bg{display:grid;grid-template-columns:1fr 272px;gap:14px;}
+.panel{background:#fff;border:1px solid #EAECF0;border-radius:10px;padding:16px;}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.pt{font-size:13px;font-weight:500;color:#111;}
+.ps{font-size:12px;color:#9BA3AE;margin-top:2px;}
+.cw{position:relative;height:200px;}
+
+.t5l{display:flex;flex-direction:column;gap:5px;margin-top:2px;}
+.t5i{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;background:#F7F8FA;}
+.rk{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0;}
+.rk1{background:#FEF3C7;color:#92400E;}
+.rk2{background:#F3F4F6;color:#6B7280;}
+.rk3{background:#FEE8E2;color:#9B2617;}
+.rk45{background:#F7F8FA;color:#9BA3AE;border:1px solid #EAECF0;}
+.t5inf{flex:1;}
+.t5n{font-size:12px;font-weight:500;color:#374151;}
+.t5tm{font-size:11px;color:#9BA3AE;}
+.t5v{font-size:14px;font-weight:500;color:#111;}
+.t5u{font-size:10px;color:#9BA3AE;}
+
+.rc{display:flex;flex-direction:column;gap:12px;}
+.tgr{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+.tgi{display:flex;align-items:center;gap:8px;}
+.tgic{width:30px;height:30px;border-radius:7px;background:#F7F8FA;border:1px solid #EAECF0;display:flex;align-items:center;justify-content:center;}
+.tgic i{font-size:15px;color:#6B7280;}
+.tgn{font-size:13px;font-weight:500;color:#111;}
+.tgs{font-size:11px;color:#9BA3AE;}
+.sw{width:38px;height:21px;border-radius:11px;background:#E5E7EB;cursor:pointer;position:relative;flex-shrink:0;transition:background .2s;}
+.sw.on{background:#16A34A;}
+.sw::after{content:'';position:absolute;width:17px;height:17px;border-radius:50%;background:#fff;top:2px;left:2px;transition:transform .2s;box-shadow:0 1px 2px rgba(0,0,0,.15);}
+.sw.on::after{transform:translateX(17px);}
+
+.dw{display:flex;align-items:center;justify-content:center;margin:10px 0 4px;position:relative;height:120px;}
+.dc{position:absolute;text-align:center;}
+.dp{font-size:22px;font-weight:500;color:#111;}
+.dl{font-size:11px;color:#9BA3AE;}
+.dleg{display:flex;gap:14px;justify-content:center;margin-top:2px;}
+.dli{display:flex;align-items:center;gap:4px;font-size:11px;color:#6B7280;}
+.dld{width:7px;height:7px;border-radius:50%;}
+
+.cond-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;}
+.cond-row+.cond-row{border-top:1px solid #F3F4F6;}
+.cond-k{font-size:12px;color:#6B7280;}
+.cond-v{font-size:12px;font-weight:500;}
+.cond-v.g{color:#16A34A;}
+.cond-v.r{color:#E8533A;}
+.cond-v.y{color:#D97706;}
+
+.sbar{height:36px;background:#fff;border-top:1px solid #EAECF0;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.sbl{display:flex;align-items:center;gap:5px;font-size:11px;color:#16A34A;}
+.sbl i{font-size:13px;}
+.sbr{font-size:11px;color:#9BA3AE;}
+</style>
+
+<div class="d">
+  <div class="sb">
+    <div class="sb-logo">
+      <div class="sb-bars"><span style="height:7px"></span><span style="height:11px"></span><span style="height:15px"></span><span style="height:9px"></span></div>
+      <div>
+        <div style="font-size:14px;font-weight:500;color:#111;">Knowvio</div>
+        <div style="font-size:10px;color:#9BA3AE;letter-spacing:.07em;text-transform:uppercase;">Water Monitor</div>
+      </div>
+    </div>
+    <div style="flex:1;padding:6px 0;">
+      <div class="nav-lbl">Menu</div>
+      <div class="nav-a on"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</div>
+      <div class="nav-a"><i class="ti ti-history" aria-hidden="true"></i> Histori &amp; Laporan</div>
+      <div class="nav-a"><i class="ti ti-settings" aria-hidden="true"></i> Konfigurasi</div>
+      <div style="height:1px;background:#EAECF0;margin:10px 12px;"></div>
+      <div class="nav-lbl">Status Sensor</div>
+      <div class="sen-item">
+        <div class="dot on"></div>
+        <div><div class="sn">KDC01</div><div class="ss">Kolam Pengendap 1</div></div>
+      </div>
+      <div class="sen-item">
+        <div class="dot off"></div>
+        <div><div class="sn" style="color:#9BA3AE;">KDC02</div><div class="ss">Kolam Pengendap 2</div></div>
+      </div>
+    </div>
+    <div class="sb-foot">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <div class="av">AJ</div>
+        <div><div style="font-size:13px;font-weight:500;color:#111;">Alex Johnson</div><div style="font-size:11px;color:#9BA3AE;">Pro Member</div></div>
+      </div>
+      <div class="nav-a" style="margin:0;"><i class="ti ti-logout" aria-hidden="true"></i> Logout</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-l"><h2>Welcome back, Admin!</h2><p>Monitoring KIDECO Mining Water Quality</p></div>
+      <div class="tb-r">
+        <div class="badge-danger"><i class="ti ti-alert-triangle" aria-hidden="true"></i><div class="pdot"></div> Bahaya — Air Asam</div>
+        <div class="sel"><i class="ti ti-point" aria-hidden="true"></i> KDC01 — Kolam Pengendap 1 <i class="ti ti-chevron-down" aria-hidden="true"></i></div>
+        <div class="nb"><i class="ti ti-bell" aria-hidden="true"></i><div class="nbd"></div></div>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="alert">
+        <div class="al-l">
+          <div class="al-ic"><i class="ti ti-alert-circle" aria-hidden="true"></i></div>
+          <div>
+            <div class="al-t">Peringatan kritis: Air asam terdeteksi pada <a href="#">KDC01</a></div>
+            <div class="al-d"><b>Insight:</b> Tingkat keasaman di luar ambang batas aman. Pompa penetralisasi disarankan segera diaktifkan.</div>
+          </div>
+        </div>
+        <button class="al-btn">Ambil tindakan</button>
+      </div>
+
+      <div class="sg">
+        <div class="sc">
+          <div class="sc-h"><div class="sc-lbl"><i class="ti ti-droplet" aria-hidden="true"></i> Nilai pH</div><div class="pill r">Acidic</div></div>
+          <div class="sc-v rv">3.2</div><div class="sc-u">pH level</div>
+        </div>
+        <div class="sc">
+          <div class="sc-h"><div class="sc-lbl"><i class="ti ti-activity" aria-hidden="true"></i> Nilai TDS</div><div class="pill y">High</div></div>
+          <div class="sc-v yv">1198</div><div class="sc-u">ppm</div>
+        </div>
+        <div class="sc">
+          <div class="sc-h"><div class="sc-lbl"><i class="ti ti-cpu" aria-hidden="true"></i> Node aktif</div><div class="pill g">Online</div></div>
+          <div class="sc-v">02</div><div class="sc-u">Node</div>
+        </div>
+        <div class="sc">
+          <div class="sc-h"><div class="sc-lbl"><i class="ti ti-shield" aria-hidden="true"></i> Status sistem</div><div class="pill r">Bahaya</div></div>
+          <div class="sc-v cv">KRITIS</div><div class="sc-u">Status saat ini</div>
+        </div>
+      </div>
+
+      <div class="bg">
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="panel">
+            <div class="ph">
+              <div><div class="pt">Top 5 pH tertinggi</div><div class="ps">Puncak anomali keasaman yang terekam sistem</div></div>
+            </div>
+            <div class="t5l">
+              <div class="t5i"><div class="rk rk1">#1</div><div class="t5inf"><div class="t5n">KDC02</div><div class="t5tm">2026-06-09 17:00:08</div></div><div><div class="t5v">7.80</div><div class="t5u">pH</div></div></div>
+              <div class="t5i"><div class="rk rk2">#2</div><div class="t5inf"><div class="t5n">KDC01</div><div class="t5tm">2026-06-09 18:15:27</div></div><div><div class="t5v">7.50</div><div class="t5u">pH</div></div></div>
+              <div class="t5i"><div class="rk rk3">#3</div><div class="t5inf"><div class="t5n">KDC02</div><div class="t5tm">2026-06-09 19:30:31</div></div><div><div class="t5v">7.20</div><div class="t5u">pH</div></div></div>
+              <div class="t5i"><div class="rk rk45">#4</div><div class="t5inf"><div class="t5n">KDC02</div><div class="t5tm">2026-06-09 21:00:58</div></div><div><div class="t5v">7.00</div><div class="t5u">pH</div></div></div>
+              <div class="t5i"><div class="rk rk45">#5</div><div class="t5inf"><div class="t5n">KDC01</div><div class="t5tm">2026-06-09 18:45:09</div></div><div><div class="t5v">6.80</div><div class="t5u">pH</div></div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="ph">
+              <div><div class="pt">Grafik tren real-time</div><div class="ps">Data Gateway ESP32 · Interval 1 detik</div></div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#9BA3AE;"><span style="width:9px;height:9px;border-radius:2px;background:#E8533A;display:inline-block;"></span> pH aktif</div>
+            </div>
+            <div class="cw"><canvas id="tc" role="img" aria-label="Tren pH real-time sekitar 3.2">Data pH real-time sekitar 3.2</canvas></div>
+          </div>
+        </div>
+
+        <div class="rc">
+          <div class="panel">
+            <div class="pt">Quick action control</div>
+            <div class="tgr">
+              <div class="tgi">
+                <div class="tgic"><i class="ti ti-volume-off" aria-hidden="true"></i></div>
+                <div><div class="tgn">Audio buzzer</div><div class="tgs" id="bst">Nonaktif (muted)</div></div>
+              </div>
+              <div class="sw" id="bsw" onclick="toggleB()" role="switch" aria-checked="false" aria-label="Audio buzzer toggle"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="pt">Distribusi status</div>
+            <div style="font-size:11px;color:#9BA3AE;margin-top:2px;">20 log total dianalisis</div>
+            <div class="dw">
+              <canvas id="dc" width="120" height="120" role="img" aria-label="60% aman, 40% bahaya">60% aman, 40% bahaya.</canvas>
+              <div class="dc"><div class="dp">60%</div><div class="dl">Aman</div></div>
+            </div>
+            <div class="dleg">
+              <div class="dli"><div class="dld" style="background:#16A34A;"></div> Aman 60%</div>
+              <div class="dli"><div class="dld" style="background:#E8533A;"></div> Bahaya 40%</div>
+            </div>
+          </div>
+
+          <div class="panel" style="background:#FAFAFA;">
+            <div class="pt" style="margin-bottom:8px;">Kondisi air saat ini</div>
+            <div class="cond-row"><span class="cond-k">pH aman</span><span class="cond-v g">6.5 – 8.5</span></div>
+            <div class="cond-row"><span class="cond-k">pH saat ini</span><span class="cond-v r">3.2 ↓</span></div>
+            <div class="cond-row"><span class="cond-k">TDS aman</span><span class="cond-v g">&lt; 500 ppm</span></div>
+            <div class="cond-row"><span class="cond-k">TDS saat ini</span><span class="cond-v y">1198 ppm ↑</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sbar">
+      <div class="sbl"><i class="ti ti-circle-filled" aria-hidden="true"></i> Node KDC01 terhubung · Tersinkronisasi · 19.23.21</div>
+      <div class="sbr">Interval: 1 detik · ISA-101</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+function toggleB(){
+  var sw=document.getElementById('bsw'),st=document.getElementById('bst'),on=sw.classList.toggle('on');
+  sw.setAttribute('aria-checked',on);st.textContent=on?'Aktif':'Nonaktif (muted)';
+}
+var lb=[],dt=[];
+for(var i=0;i<60;i++){lb.push('');dt.push(+(3.2+(Math.random()-.5)*.35).toFixed(2));}
+new Chart(document.getElementById('tc'),{
+  type:'line',
+  data:{labels:lb,datasets:[{label:'pH',data:dt,borderColor:'#E8533A',backgroundColor:'rgba(232,83,58,0.07)',borderWidth:1.5,pointRadius:0,fill:true,tension:.4}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return'pH: '+c.parsed.y.toFixed(2);}}}},scales:{x:{display:false},y:{min:2.4,max:4.2,grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:11},color:'#9BA3AE',callback:function(v){return v.toFixed(1);}}}}}
+});
+new Chart(document.getElementById('dc'),{
+  type:'doughnut',
+  data:{datasets:[{data:[60,40],backgroundColor:['#16A34A','#E8533A'],borderWidth:0,hoverOffset:3}]},
+  options:{responsive:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.parsed+'%';}}}}}
+});
+</script>
